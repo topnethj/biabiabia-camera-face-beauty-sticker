@@ -1,0 +1,34 @@
+apply plugin: 'com.android.library'
+
+android {
+    compileSdkVersion rootProject.compileSdkVersion
+    buildToolsVersion rootProject.buildToolsVersion
+    defaultConfig {
+        minSdkVersion rootProject.minSdkVersion
+        targetSdkVersion rootProject.targetSdkVersion
+        resConfigs "zh"
+        ndk {
+            abiFilters 'armeabi-v7a'
+        }
+    }
+}
+
+
+dependencies {
+    compile fileTree(include: ['*.jar'], dir: 'libs')
+
+    compile "com.android.support:design:${rootProject.supportLibraryVersion}"
+    compile "com.android.support:appcompat-v7:${rootProject.supportLibraryVersion}"
+    compile "com.android.support:cardview-v7:${rootProject.supportLibraryVersion}"
+    compile "com.android.support:percent:${rootProject.supportLibraryVersion}"
+    compile "com.android.support:gridlayout-v7:${rootProject.supportLibraryVersion}"
+
+    compile 'com.google.code.gson:gson:2.6.2'
+    compile 'com.jakewharton:butterknife:8.2.1'
+    compile 'org.xutils:xutils:3.3.36'
+    compile 'com.github.hotchemi:permissionsdispatcher:2.1.2'
+    compile 'com.android.support:multidex:1.0.1'
+    compile 'com.alibaba:fastjson:1.2.7'
+    compile 'com.orhanobut:logger:1.15'
+    compile 'org.greenrobot:eventbus:3.0.0'
+}
