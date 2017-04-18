@@ -26,14 +26,10 @@ public class ZZEffectBlendEngine_v2 {
 
         if(vshPath == null || fshPath == null) {
             if(count == 1){
-                vshPath = "resource/blend1.vsh";
-                fshPath = "resource/blend1.fsh";
             }else if(count == 2){
                 vshPath = "resource/blend2.vsh";
                 fshPath = "resource/blend2.fsh";
             }else if(count == 3){
-                vshPath = "resource/blend3.vsh";
-                fshPath = "resource/blend3.fsh";
             }
         }
 

@@ -2,14 +2,80 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/activity_main"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:paddingBottom="@dimen/activity_vertical_margin"
-    android:paddingLeft="@dimen/activity_horizontal_margin"
-    android:paddingRight="@dimen/activity_horizontal_margin"
-    android:paddingTop="@dimen/activity_vertical_margin">
+    android:layout_height="match_parent">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+        <com.douyaim.qsapp.camera.widget.CameraSurfaceView
+            android:id="@+id/camera"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+    </LinearLayout>
+
+    <RelativeLayout
+        android:id="@+id/rl_line1"
+        android:layout_width="match_parent"
+        android:layout_height="48dp">
+
+        <!--切换闪光灯-->
+        <ImageButton
+            android:id="@+id/btn_switch_flash"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_centerVertical="true"
+            android:background="@null"
+            android:paddingEnd="10dp"
+            android:paddingStart="10dp"
+            android:src="@drawable/btn_camera_flash" />
+
+        <!--切换前后摄像头-->
+        <ImageView
+            android:id="@+id/btn_switch_front"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_alignParentEnd="true"
+            android:layout_centerVertical="true"
+            android:paddingEnd="10dp"
+            android:paddingStart="10dp"
+            android:src="@drawable/btn_camera_facing" />
+
+        <!--美颜开关-->
+        <ImageView
+            android:id="@+id/btn_switch_meiyan"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_centerVertical="true"
+            android:layout_toStartOf="@id/btn_switch_front"
+            android:paddingEnd="10dp"
+            android:paddingStart="10dp"
+            android:src="@drawable/selector_meiyan_icon" />
+    </RelativeLayout>
 
     <TextView
+        android:id="@+id/specific_tip"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Hello World!" />
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="180dp"
+        android:textColor="#FFFFFF"
+        android:textSize="18sp" />
+
+    <SurfaceView
+        android:id="@+id/surfaceViewOverlap"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"/>
+
+    <TextView
+        android:id="@+id/tv_loadTx"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="60dp"
+        android:padding="10dp"
+        android:text="Load effect"
+        android:textColor="#FFFFFF"
+        android:textSize="18sp" />
+
 </RelativeLayout>
