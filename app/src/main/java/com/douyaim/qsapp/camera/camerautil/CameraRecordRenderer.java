@@ -43,11 +43,11 @@ public class CameraRecordRenderer implements GLSurfaceView.Renderer {
     private boolean isMeiYan = false;
 
     public QSFilterManager.FilterType mCurrentFilterType;
+    public String mCurrentConfigPath;
 
     private SurfaceTexture mSurfaceTexture;
     private final float[] mSTMatrix = new float[16];
 
-    public String mCurrentConfigPath;
     public boolean isTxAction;
 
     public int mSurfaceWidth, mSurfaceHeight;
@@ -257,11 +257,9 @@ public class CameraRecordRenderer implements GLSurfaceView.Renderer {
         if (!StringUtils.isEmpty(configPath) && !configPath.equals(mCurrentConfigPath)) {
             txFilter = new ZZEffectFilter_v2(configPath, new AndroidSize(mSurfaceWidth, mSurfaceHeight),
                     new AndroidSize(mIncomingWidth, mIncomingHeight), isFace);
-            ZZFaceManager_v2.getZZFaceManager().reset(true);
             ((ZZEffectFilter_v2) txFilter).install();
             mCurrentFilterType = QSFilterManager.FilterType.TX;
         }else{
-            ZZFaceManager_v2.getZZFaceManager().reset(false);
             if (!isMeiYan) {
                 mCurrentFilterType = QSFilterManager.FilterType.Normal;
             } else {
@@ -308,7 +306,7 @@ public class CameraRecordRenderer implements GLSurfaceView.Renderer {
     }
 
     public void filterDestroyed(boolean all) {
-        ZZFaceManager_v2.getZZFaceManager().reset(false);
+        //ZZFaceManager_v2.getZZFaceManager().reset(false);
         if (txFilter != null) {
             ((ZZEffectFilter_v2) txFilter).uninstall();
             txFilter = null;
@@ -322,7 +320,7 @@ public class CameraRecordRenderer implements GLSurfaceView.Renderer {
         if (mFullScreenMeiyan != null && all) {
             mFullScreenMeiyan.release(true);
         }
-        mCurrentConfigPath = null;
+        //mCurrentConfigPath = null;
         this.isTxAction = false;
     }
 

@@ -21,7 +21,9 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
+
 import com.douyaim.effect.ZZEffectCommon;
+import com.douyaim.effect.effectimp.ZZEffectConfig_v2;
 import com.douyaim.effect.face.ZZFaceManager_v2;
 import com.douyaim.effect.face.ZZFaceResult;
 import com.douyaim.qsapp.camera.camerautil.CameraController;
@@ -32,15 +34,21 @@ import com.sensetime.stmobileapi.STMobile106;
 import com.sensetime.stmobileapi.STMobileFaceAction;
 import com.sensetime.stmobileapi.STMobileMultiTrack106;
 import com.sensetime.stmobileapi.STUtils;
+
 import java.lang.ref.SoftReference;
 import java.util.ArrayList;
 import java.util.List;
+
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import butterknife.Unbinder;
 
 public class MainActivity extends AppCompatActivity {
+
+    private static final String txResUrl = "file:///assets/effect/tuzi.zip";
+    //private static final String txResUrl = "file:///assets/effect/piaoxin.zip";
+    //private static final String txResUrl = "file:///assets/effect/xinfeiwen.zip";
 
     private static final int ST_MOBILE_TRACKING_MULTI_THREAD = 0x00000000; ///< 多线程，功耗较多，卡顿较少
     private static final int ST_MOBILE_TRACKING_SINGLE_THREAD = 0x00010000;  ///< 单线程，功耗较少，对于性能弱的手机，会偶尔有卡顿现象
@@ -53,6 +61,9 @@ public class MainActivity extends AppCompatActivity {
 
     @BindView(R.id.tv_loadTx)
     protected TextView loadTx;
+
+    @BindView(R.id.tv_unloadTx)
+    protected TextView unLoadTx;
 
     @BindView(R.id.btn_switch_meiyan)
     protected View isMeiYanView;
@@ -153,6 +164,7 @@ public class MainActivity extends AppCompatActivity {
         mCameraSurfaceView.setPreviewCallback(new MyCameraPreviewCallBack(this));
         mCameraSurfaceView.setHandler(new MyHandler());
         mCameraSurfaceView.init(this, realHeight, realWidth);
+        ZZFaceManager_v2.getZZFaceManager().reset(true);
     }
 
     @Override
@@ -398,7 +410,7 @@ public class MainActivity extends AppCompatActivity {
         btnSwitchSplash.setSelected(false);
     }
 
-    @OnClick({R.id.btn_switch_flash, R.id.btn_switch_front, R.id.btn_switch_meiyan, R.id.tv_loadTx})
+    @OnClick({R.id.btn_switch_flash, R.id.btn_switch_front, R.id.btn_switch_meiyan, R.id.tv_loadTx, R.id.tv_unloadTx})
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.btn_switch_flash:
@@ -416,12 +428,23 @@ public class MainActivity extends AppCompatActivity {
             case R.id.btn_switch_front:
                 if (Camera.getNumberOfCameras() > 1) {
                     switchCameraFacing();
+                    btnSwitchSplash.setSelected(false);
                 }
                 break;
             case R.id.btn_switch_meiyan:
                 changeMeiYan();
                 break;
             case R.id.tv_loadTx:
+                loadTx.setEnabled(false);
+                String ePath = ZZEffectConfig_v2.effectConfigUnZip1(this.getApplicationContext(), txResUrl, "config.js");
+                if(ePath != null){
+                    mCameraSurfaceView.changeFilter(ePath, true, "", false);
+                }else{
+                    loadTx.setEnabled(true);
+                }
+                break;
+            case R.id.tv_unloadTx:
+                mCameraSurfaceView.changeFilter(null, false, "", false);
                 break;
         }
     }
@@ -438,6 +461,7 @@ public class MainActivity extends AppCompatActivity {
                         actionInfo = (bundle.getString("actionInfo") == null ? "" : bundle.getString("actionInfo"));
                     }
                     specificTip.setText(actionInfo);
+                    loadTx.setEnabled(true);
                     break;
                 case CameraSurfaceView.CameraHandler.TRACK_FACE_ING:
                     break;
