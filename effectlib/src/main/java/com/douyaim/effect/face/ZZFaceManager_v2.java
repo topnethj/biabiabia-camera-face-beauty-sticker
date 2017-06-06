@@ -11,6 +11,9 @@ import java.util.Stack;
  * Created by hj on 16/9/21.
  */
 public class ZZFaceManager_v2 {
+    static {
+        System.loadLibrary("rotestt");
+    }
 
     private Object o1 = new Object();
     private Object o2 = new Object();
@@ -110,5 +113,7 @@ public class ZZFaceManager_v2 {
         randomValue = -1;
         currentFaceResults = new ArrayList<>();
     }
+
+    public native double[] rotestimate2Native(double[] points, float screenRatio);
 
 }

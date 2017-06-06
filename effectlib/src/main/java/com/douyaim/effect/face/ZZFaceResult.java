@@ -3,6 +3,8 @@ package com.douyaim.effect.face;
 import android.graphics.PointF;
 import android.support.annotation.NonNull;
 
+import com.douyaim.effect.ZZEffectCommon;
+
 import java.text.DecimalFormat;
 
 /**
@@ -104,6 +106,7 @@ public class ZZFaceResult {
 
         this.faceStatus = judgeFaceStatusWithPoints(points, faceIndex);
 
+        /*
         PointF p1 = points[46];
         PointF p2 = points[43];
         PointF p3 = points[93];
@@ -119,11 +122,19 @@ public class ZZFaceResult {
         p1 = points[16];
         p2 = points[43];
 
-        float rotZ = getRoll(p1, p2, screenScale);
+        float rotZ = getRoll(p1, p2, screenScale);*/
 
-        this.pitch = rotX;
-        this.yaw = rotY;
-        this.roll = rotZ;
+        double[] points_d = new double[ZZEffectCommon.ZZNumberOfFacePoints * 2];
+        for(int i = 0; i < ZZEffectCommon.ZZNumberOfFacePoints; i++) {
+            int yIndex = i + 106;
+            points_d[i] = points[i].x;
+            points_d[yIndex] = points[i].y;
+        }
+        double[] rtst = ZZFaceManager_v2.getZZFaceManager().rotestimate2Native(points_d, screenScale);
+
+        this.pitch = (float)rtst[0];
+        this.yaw = (float)rtst[1];
+        this.roll = -(float)rtst[2];
     }
 
     private void turnPoint(PointF cvFacePoint, int i){
