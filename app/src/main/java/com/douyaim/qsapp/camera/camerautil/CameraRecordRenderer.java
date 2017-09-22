@@ -135,8 +135,8 @@ public class CameraRecordRenderer implements GLSurfaceView.Renderer {
             }
             tx_ttid = ((ZZEffectFilter_v2) txFilter).onDrawFrame(
                     ZZFaceManager_v2.getZZFaceManager().currentTimeMillis, faceResult, my_ttid);
-            ((ZZEffectFilter_v2) txFilter).blend(new int[]{tx_ttid[0], tx_ttid[1], tx_ttid[2]}, null, null);
-            action(faceResult);
+            //((ZZEffectFilter_v2) txFilter).blend(new int[]{tx_ttid[0], tx_ttid[1], tx_ttid[2]}, null, null);
+            //action(faceResult);
         }else {
             mFullScreen.drawFrame(mTextureId, mSTMatrix, false);
         }

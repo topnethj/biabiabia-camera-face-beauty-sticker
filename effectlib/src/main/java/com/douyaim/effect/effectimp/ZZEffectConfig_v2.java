@@ -6,11 +6,14 @@ import android.support.annotation.NonNull;
 
 import com.douyaim.effect.utils.OpenGlUtils;
 import com.douyaim.effect.utils.ZIPExtract;
+import com.douyaim.qsapp.LibApp;
+import com.douyaim.qsapp.utils.FileUtils;
 import com.google.gson.Gson;
 import com.google.gson.annotations.SerializedName;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Serializable;
@@ -150,4 +153,48 @@ public class ZZEffectConfig_v2  implements Serializable {
         return null;
     }
 
+    public static synchronized String effectConfigCopy(Context context, String path) {
+        String rootPath = FileUtils.getExternalCacheDir(context);
+        String configPath = rootPath + File.separator + path;
+        if (new File(configPath).exists()) {
+            return configPath + File.separator;
+        }
+        copyFiles(context, rootPath, path);
+        return configPath + File.separator;
+    }
+
+    private static void copyFiles(Context context, String rootPath, String path) {
+        try {
+            String str[] = context.getAssets().list(path);
+            if (str.length > 0) {
+                File file = new File(rootPath + "/" + path);
+                file.mkdirs();
+                for (String string : str) {
+                    path = path + "/" + string;
+                    copyFiles(context, rootPath, path);
+                    path = path.substring(0, path.lastIndexOf('/'));
+                }
+            } else {
+                File file = new File(rootPath + "/" + path);
+                if(!file.exists()) {
+                    InputStream is = context.getAssets().open(path);
+                    FileOutputStream fos = new FileOutputStream(file);
+                    byte[] buffer = new byte[1024];
+                    //int count = 0;
+                    while (true) {
+                        //count++;
+                        int len = is.read(buffer);
+                        if (len == -1) {
+                            break;
+                        }
+                        fos.write(buffer, 0, len);
+                    }
+                    is.close();
+                    fos.close();
+                }
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 }

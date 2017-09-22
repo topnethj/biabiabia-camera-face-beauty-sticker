@@ -336,7 +336,8 @@ public class MainActivity extends AppCompatActivity {
                 break;
             case R.id.b_loadTx:
                 loadTx.setEnabled(false);
-                String ePath = ZZEffectConfig_v2.effectConfigUnZip1(this.getApplicationContext(), txResUrl, "config.js");
+                //String ePath = ZZEffectConfig_v2.effectConfigUnZip1(this.getApplicationContext(), txResUrl, "config.js");
+                String ePath = ZZEffectConfig_v2.effectConfigCopy(this.getApplicationContext(), "effect/tuzi");
                 if(ePath != null){
                     mCameraSurfaceView.changeFilter(ePath, true, "", true);
                 }else{
