@@ -80,8 +80,5 @@
 # -keep public class * implements mypackage.MyInterface
 
 #for  人脸识别相关
--keep class com.sun.jna.**{*;}
--keep class com.sun.jna.**{public <init>();}
-
--keep class com.sensetime.stmobileapi.**{*;}
--keep class com.sensetime.stmobileapi.**{public <init>();}
+-keep class com.hulu.track.** { *; }
+-dontwarn com.hulu.track.**

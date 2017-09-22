@@ -7,8 +7,6 @@ import android.graphics.Paint;
 import android.graphics.PixelFormat;
 import android.graphics.Point;
 import android.graphics.PointF;
-import android.graphics.PorterDuff;
-import android.graphics.Rect;
 import android.hardware.Camera;
 import android.os.Bundle;
 import android.os.Handler;
@@ -19,26 +17,20 @@ import android.view.Display;
 import android.view.SurfaceView;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
-
-import com.douyaim.effect.ZZEffectCommon;
 import com.douyaim.effect.effectimp.ZZEffectConfig_v2;
 import com.douyaim.effect.face.ZZFaceManager_v2;
 import com.douyaim.effect.face.ZZFaceResult;
 import com.douyaim.qsapp.camera.camerautil.CameraController;
 import com.douyaim.qsapp.camera.widget.CameraSurfaceView;
+import com.hulu.sdk.Faces;
+import com.hulu.sdk.HuluUtils;
 import com.multitrack106.Accelerometer;
-import com.sensetime.stmobileapi.AuthCallback;
-import com.sensetime.stmobileapi.STMobile106;
-import com.sensetime.stmobileapi.STMobileFaceAction;
-import com.sensetime.stmobileapi.STMobileMultiTrack106;
-import com.sensetime.stmobileapi.STUtils;
-
 import java.lang.ref.SoftReference;
 import java.util.ArrayList;
 import java.util.List;
-
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
@@ -50,20 +42,14 @@ public class MainActivity extends AppCompatActivity {
     //private static final String txResUrl = "file:///assets/effect/piaoxin.zip";
     //private static final String txResUrl = "file:///assets/effect/xinfeiwen.zip";
 
-    private static final int ST_MOBILE_TRACKING_MULTI_THREAD = 0x00000000; ///< 多线程，功耗较多，卡顿较少
-    private static final int ST_MOBILE_TRACKING_SINGLE_THREAD = 0x00010000;  ///< 单线程，功耗较少，对于性能弱的手机，会偶尔有卡顿现象
-    private static final int ST_MOBILE_TRACKING_ENABLE_DEBOUNCE = 0x00000010; ///< 打开去抖动
-    private static final int ST_MOBILE_TRACKING_ENABLE_FACE_ACTION = 0x00000020; ///< 检测脸部动作：张嘴、眨眼、抬眉、点头、摇头
-    private static final int ST_MOBILE_TRACKING_DEFAULT_CONFIG = ST_MOBILE_TRACKING_MULTI_THREAD | ST_MOBILE_TRACKING_ENABLE_DEBOUNCE;
-
     @BindView(R.id.specific_tip)
     protected TextView specificTip;
 
-    @BindView(R.id.tv_loadTx)
-    protected TextView loadTx;
+    @BindView(R.id.b_loadTx)
+    protected Button loadTx;
 
-    @BindView(R.id.tv_unloadTx)
-    protected TextView unLoadTx;
+    @BindView(R.id.b_unloadTx)
+    protected Button unLoadTx;
 
     @BindView(R.id.btn_switch_meiyan)
     protected View isMeiYanView;
@@ -88,17 +74,12 @@ public class MainActivity extends AppCompatActivity {
 
     //人脸识别
     private static final int MESSAGE_DRAW_POINTS = 999;
-    public static int fps;
     private boolean isTrackerPaused = false;
-    private Object lockObj = new Object();
-    private STMobileMultiTrack106 tracker = null;
     private HandlerThread trackerHandlerThread;
     private Handler trackerHandler;
     private byte[] nv21;
     private byte[] tmp;
     private Accelerometer acc;
-    private List<Long> timeCounter;
-    private int timeStart = 0;
 
     private int realWidth;
     private int realHeight;
@@ -113,18 +94,13 @@ public class MainActivity extends AppCompatActivity {
 
         acc = new Accelerometer(this.getApplicationContext());
 
-        timeCounter = new ArrayList<>();
         trackerHandlerThread = new HandlerThread("DrawFacePointsThread");
         trackerHandlerThread.start();
         trackerHandler = new Handler(trackerHandlerThread.getLooper()) {
             @Override
             public void handleMessage(Message msg) {
                 if (msg.what == MESSAGE_DRAW_POINTS) {
-                    synchronized (lockObj) {
-                        if (!isTrackerPaused) {
-                            faceDetect();
-                        }
-                    }
+                    faceDetect();
                 }
             }
         };
@@ -175,26 +151,8 @@ public class MainActivity extends AppCompatActivity {
 
         //启动人脸识别
         isTrackerPaused = false;
-        if (timeCounter != null) {
-            timeCounter.clear();
-            timeStart = 0;
-        }
         if (acc != null) {
             acc.start();
-        }
-        if (tracker == null) {
-            //long start_init = System.currentTimeMillis();
-            AuthCallback authCallback = new AuthCallback() {
-                @Override
-                public void onAuthResult(boolean succeed, String errMessage) {
-                }
-            };
-            int config = ST_MOBILE_TRACKING_DEFAULT_CONFIG;
-            tracker = new STMobileMultiTrack106(this, config, authCallback);
-            int max = ZZEffectCommon.ZZNumberOfFace;
-            tracker.setMaxDetectableFaces(max);
-            //long end_init = System.currentTimeMillis();
-            //L.i("track106", "init cost " + (end_init - start_init) + " ms");
         }
     }
 
@@ -207,12 +165,6 @@ public class MainActivity extends AppCompatActivity {
         trackerHandler.removeMessages(MESSAGE_DRAW_POINTS);
         if (acc != null) {
             acc.stop();
-        }
-        synchronized (lockObj) {
-            if (tracker != null) {
-                tracker.destory();
-                tracker = null;
-            }
         }
     }
 
@@ -233,10 +185,10 @@ public class MainActivity extends AppCompatActivity {
 
         @Override
         public void onPreviewFrame(byte[] data, Camera camera) {
-            CameraController.getInstance().addCallbackBuffer(data);
             if (getMA() == null || data == null) {
                 return;
             }
+            CameraController.getInstance().addCallbackBuffer(data);
             if (!ZZFaceManager_v2.getZZFaceManager().canTrack) {
                 return;
             }
@@ -280,113 +232,61 @@ public class MainActivity extends AppCompatActivity {
 
     //人脸识别
     private void faceDetect() {
-        if (!ZZFaceManager_v2.getZZFaceManager().canTrack) {
+        if (isTrackerPaused) {
             return;
-        }
-        synchronized (nv21) {
-            System.arraycopy(nv21, 0, tmp, 0, nv21.length);
-        }
-
-        boolean frontCamera = CameraController.getInstance().getCameraId() == Camera.CameraInfo.CAMERA_FACING_FRONT;
-        Camera.CameraInfo info = CameraController.getInstance().mCameraInfo;
-
-        /**
-         * 获取重力传感器返回 方向
-         */
-        int dir = Accelerometer.getDirection();
-
-        //在使用后置摄像头，且传感器方向为0或2时，后置摄像头与前置orentation相反
-        if (!frontCamera && dir == 0) {
-            dir = 2;
-        } else if (!frontCamera && dir == 2) {
-            dir = 0;
-        }
-
-        /**
-         * 请注意前置摄像头与后置摄像头旋转定义不同
-         * 请注意不同手机摄像头旋转定义不同
-         */
-        if (((info.orientation == 270 && (dir & 1) == 1) ||
-                (info.orientation == 90 && (dir & 1) == 0))) {
-            dir = (dir ^ 2);
-        }
-
-        /**
-         * 调 实时人脸检测函数，返回当前人脸信息
-         */
-        //long start_track = System.currentTimeMillis();
-        STMobileFaceAction[] faceActions = tracker.trackFaceAction(tmp, dir, mCameraSurfaceView.getFrameWidth(), mCameraSurfaceView.getFrameHeight());
-        //long end_track = System.currentTimeMillis();
-        //L.i("track106", "track cost " + (end_track - start_track) + " ms");
-        /*
-        long timer = System.currentTimeMillis();
-        timeCounter.add(timer);
-        while (timeStart < timeCounter.size()
-                && timeCounter.get(timeStart) < timer - 1000) {
-            timeStart++;
-        }
-        fps = timeCounter.size() - timeStart;
-        //L.i("track106", "fps " + fps);
-        if (timeStart > 100) {
-            timeCounter = timeCounter.subList(timeStart, timeCounter.size() - 1);
-            timeStart = 0;
-        }*/
-
-        if (faceActions != null) {
-            if (!mOverlap.getHolder().getSurface().isValid()) {
+        } else {
+            if (!ZZFaceManager_v2.getZZFaceManager().canTrack) {
                 return;
             }
-            Canvas canvas = mOverlap.getHolder().lockCanvas();
-            if (canvas == null){
-                return;
-            }
-            canvas.drawColor(0, PorterDuff.Mode.CLEAR);
-            canvas.setMatrix(matrix);
-
-            boolean rotate270 = info.orientation == 270;
-            List<ZZFaceResult> faceResults = new ArrayList<>();
-            for (int j = 0; j < faceActions.length; j++) {
-                STMobile106 r = faceActions[j].getFace();
-
-                Rect rect;
-                if (rotate270) {
-                    rect = STUtils.RotateDeg270(r.getFaceRect(), mCameraSurfaceView.getFrameWidth(), mCameraSurfaceView.getFrameHeight());
-                } else {
-                    rect = STUtils.RotateDeg90(r.getFaceRect(), mCameraSurfaceView.getFrameWidth(), mCameraSurfaceView.getFrameHeight());
-                }
-
-                PointF[] points = r.getPointsArray();
-                for (int i = 0; i < points.length; i++) {
-                    if (rotate270) {
-                        points[i] = STUtils.RotateDeg270(points[i], mCameraSurfaceView.getFrameWidth(), mCameraSurfaceView.getFrameHeight());
-                    } else {
-                        points[i] = STUtils.RotateDeg90(points[i], mCameraSurfaceView.getFrameWidth(), mCameraSurfaceView.getFrameHeight());
-                    }
-                }
-
-                STUtils.drawFaceRect(canvas, rect, mCameraSurfaceView.getFrameHeight(),
-                        mCameraSurfaceView.getFrameWidth(), frontCamera);
-                STUtils.drawPoints(canvas, mPaint, points, mCameraSurfaceView.getFrameHeight(),
-                        mCameraSurfaceView.getFrameWidth(), frontCamera);
-
-                /*
-                PointF[] var10 = points;
-                int var9 = points.length;
-                for (int var8 = 0; var8 < var9; ++var8) {
-                    PointF point = var10[var8];
-                    if (frontCamera) {
-                        point.x = (float) mCameraSurfaceView.getFrameHeight() - point.x;
-                    }
-                }*/
-
-                ZZFaceResult faceResult = new ZZFaceResult(frontCamera, mCameraSurfaceView.getFrameWidth(), mCameraSurfaceView.getFrameHeight());
-                faceResult.turn(points, realWidth, realHeight, j);
-                faceResults.add(faceResult);
+            synchronized (nv21) {
+                System.arraycopy(nv21, 0, tmp, 0, nv21.length);
             }
 
-            ZZFaceManager_v2.getZZFaceManager().updateZZFaceResults(faceResults);
-            mOverlap.getHolder().unlockCanvasAndPost(canvas);
+            /**
+             * 调 实时人脸检测函数，返回当前人脸信息
+             */
+            boolean frontCamera = CameraController.getInstance().getCameraId() == Camera.CameraInfo.CAMERA_FACING_FRONT;
+            Camera.CameraInfo info = CameraController.getInstance().getCameraInfo();
+
+            /**
+             * 获取重力传感器返回 方向
+             */
+            int dir = Accelerometer.getDirection();
+
+            //在使用后置摄像头，且传感器方向为0或2时，后置摄像头与前置orentation相反
+            if (!frontCamera && dir == 0) {
+                dir = 2;
+            } else if (!frontCamera && dir == 2) {
+                dir = 0;
+            }
+
+            /**
+             * 请注意前置摄像头与后置摄像头旋转定义不同
+             * 请注意不同手机摄像头旋转定义不同
+             */
+            if (((info.orientation == 270 && (dir & 1) == 1) ||
+                    (info.orientation == 90 && (dir & 1) == 0))) {
+                dir = (dir ^ 2);
+            }
+
+            float[] faces = Faces.getInstance(LibApp.getAppContext()).detect(tmp, mCameraSurfaceView.getFrameWidth(), mCameraSurfaceView.getFrameHeight(), dir);
+            float[] bound = null;
+            prepareCanvas(faces, bound, frontCamera);
         }
+    }
+
+    private void prepareCanvas(float[] faces, float[] boundRect, boolean frontCamera) {
+        Canvas canvas = null;
+        List<ZZFaceResult> faceResults = new ArrayList<>();
+        if(faces.length >= 212){
+            PointF[] points = HuluUtils.getPoints(faces, mCameraSurfaceView.getFrameWidth(), mCameraSurfaceView.getFrameHeight(), frontCamera);
+
+            ZZFaceResult faceResult = new ZZFaceResult(frontCamera, mCameraSurfaceView.getFrameWidth(), mCameraSurfaceView.getFrameHeight());
+            faceResult.turn(points, realWidth, realHeight, 0);
+            faceResults.add(faceResult);
+        }
+
+        ZZFaceManager_v2.getZZFaceManager().updateZZFaceResults(faceResults);
     }
 
     private void switchCameraFacing() {
@@ -407,10 +307,10 @@ public class MainActivity extends AppCompatActivity {
 
     public void closeFlash() {
         CameraController.getInstance().closeLight();
-        btnSwitchSplash.setSelected(false);
+        //btnSwitchSplash.setSelected(false);
     }
 
-    @OnClick({R.id.btn_switch_flash, R.id.btn_switch_front, R.id.btn_switch_meiyan, R.id.tv_loadTx, R.id.tv_unloadTx})
+    @OnClick({R.id.btn_switch_flash, R.id.btn_switch_front, R.id.btn_switch_meiyan, R.id.b_loadTx, R.id.b_unloadTx})
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.btn_switch_flash:
@@ -428,22 +328,22 @@ public class MainActivity extends AppCompatActivity {
             case R.id.btn_switch_front:
                 if (Camera.getNumberOfCameras() > 1) {
                     switchCameraFacing();
-                    btnSwitchSplash.setSelected(false);
+                    //btnSwitchSplash.setSelected(false);
                 }
                 break;
             case R.id.btn_switch_meiyan:
                 changeMeiYan();
                 break;
-            case R.id.tv_loadTx:
+            case R.id.b_loadTx:
                 loadTx.setEnabled(false);
                 String ePath = ZZEffectConfig_v2.effectConfigUnZip1(this.getApplicationContext(), txResUrl, "config.js");
                 if(ePath != null){
-                    mCameraSurfaceView.changeFilter(ePath, true, "", false);
+                    mCameraSurfaceView.changeFilter(ePath, true, "", true);
                 }else{
                     loadTx.setEnabled(true);
                 }
                 break;
-            case R.id.tv_unloadTx:
+            case R.id.b_unloadTx:
                 mCameraSurfaceView.changeFilter(null, false, "", false);
                 break;
         }
@@ -486,7 +386,6 @@ public class MainActivity extends AppCompatActivity {
             trackerHandlerThread.quitSafely();
         }
         unbinder.unbind();
-        closeFlash();
+        //closeFlash();
     }
-
 }
