@@ -151,10 +151,6 @@ public class ZZEffectFilter_v2 extends GPUImageFilter {
             t1 = _faceFilter.onDrawFrame(my_ttid);
         }
 
-        _tieZhiFilter = null;
-        _engine2d = null;
-        _audioEngine = null;
-
         if(_tieZhiFilter != null){
             _tieZhiFilter.update(faceResult);
             t1 = _tieZhiFilter.onDrawFrame(my_ttid);

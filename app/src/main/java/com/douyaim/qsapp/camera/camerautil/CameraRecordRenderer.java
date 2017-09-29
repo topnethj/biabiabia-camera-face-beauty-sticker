@@ -19,6 +19,7 @@ import com.douyaim.qsapp.camera.filter.QSFilterManager;
 import com.douyaim.qsapp.camera.gles.FullFrameRect;
 import com.douyaim.qsapp.camera.gles.GlUtil;
 import com.douyaim.qsapp.camera.widget.CameraSurfaceView;
+import com.douyaim.qsapp.utils.L;
 import com.douyaim.qsapp.utils.StringUtils;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
@@ -108,11 +109,22 @@ public class CameraRecordRenderer implements GLSurfaceView.Renderer {
         }
     }
 
+    long time1 = 0;
+
     @Override
     public void onDrawFrame(GL10 gl) {
         if (mSurfaceTexture == null) {
             return;
         }
+
+        long newTime = System.currentTimeMillis();
+        if (time1 == 0) {
+            time1 = newTime;
+        } else {
+            L.d("********CameraRecordRenderer*********", " : " + (newTime - time1));
+            time1 = newTime;
+        }
+
         mSurfaceTexture.updateTexImage();
         mSurfaceTexture.getTransformMatrix(mSTMatrix);
 
@@ -135,8 +147,8 @@ public class CameraRecordRenderer implements GLSurfaceView.Renderer {
             }
             tx_ttid = ((ZZEffectFilter_v2) txFilter).onDrawFrame(
                     ZZFaceManager_v2.getZZFaceManager().currentTimeMillis, faceResult, my_ttid);
-            //((ZZEffectFilter_v2) txFilter).blend(new int[]{tx_ttid[0], tx_ttid[1], tx_ttid[2]}, null, null);
-            //action(faceResult);
+            ((ZZEffectFilter_v2) txFilter).blend(new int[]{tx_ttid[0], tx_ttid[1], tx_ttid[2]}, null, null);
+            action(faceResult);
         }else {
             mFullScreen.drawFrame(mTextureId, mSTMatrix, false);
         }

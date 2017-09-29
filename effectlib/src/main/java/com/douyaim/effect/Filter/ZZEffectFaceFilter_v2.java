@@ -87,7 +87,7 @@ public class ZZEffectFaceFilter_v2 extends GPUImageFilter{
         _triangleCenterUniform = GLES20.glGetUniformLocation(getProgram(), "triangleCenter");
         _faceWidthUniform = GLES20.glGetUniformLocation(getProgram(), "faceWidth");
 
-        //initCameraFrameBuffer();
+        initCameraFrameBuffer();
 
         for (int i = 0; i < ZZEffectCommon.ZZNumberOfFacePoints * 4; i++){
             _facePoints[i] = new PointF();
@@ -242,8 +242,8 @@ public class ZZEffectFaceFilter_v2 extends GPUImageFilter{
         //扁下巴
         updateTriangle();
 
-        //GLES20.glViewport(0, 0, mIntputWidth, mIntputHeight);
-        //GLES20.glBindFramebuffer(GLES20.GL_FRAMEBUFFER, mFrameBuffers[0]);
+        GLES20.glViewport(0, 0, mIntputWidth, mIntputHeight);
+        GLES20.glBindFramebuffer(GLES20.GL_FRAMEBUFFER, mFrameBuffers[0]);
     }
 
     private void updateLeftFourEye() {

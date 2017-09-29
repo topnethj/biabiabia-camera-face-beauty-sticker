@@ -1,4 +1,4 @@
-precision lowp float;
+precision highp float;
 
 varying vec2 textureCoordinate;
 
@@ -99,11 +99,11 @@ vec2 testCal(vec2 p1,vec2 p2,vec2 p3,inout vec2 top,inout vec2 left,vec2 offset,
     result.x = x33 - b22 * offset.x/sqrtValue2;
     result.y = y33 + a22 * offset.x/sqrtValue2;
     
-    top.x = result.x + b11 * dis/sqrtValue;
-    top.y = result.y - a11 * dis/sqrtValue;
+    top.x = result.x + b11 * dis/sqrtValue * 2.0;
+    top.y = result.y - a11 * dis/sqrtValue * 2.0;
     
-    left.x = result.x + b22 * 2.0 * dis/sqrtValue2;
-    left.y = result.y - a22 * 2.0 * dis/sqrtValue2;
+    left.x = result.x + b22 * 2.0 * dis/sqrtValue2  * 1.2;
+    left.y = result.y - a22 * 2.0 * dis/sqrtValue2  * 1.2;
     
     result.y = result.y * aspectRatio;
     top.y = top.y * aspectRatio;
@@ -131,41 +131,45 @@ vec2 expandTexture(mat4 centerPostion,vec2 currentTexture,float aspectRatio,vec4
         result = currentTexture + vec2(xoffset,yoffset) * ScaleFactor;
     }
     
-    /*vec2 resultToUse = result;
-    resultToUse.y = resultToUse.y/aspectRatio;
-    xoffset = resultToUse.x - centerPostionToUse[0][1];
-    yoffset = resultToUse.y - centerPostionToUse[1][1];
-    
-    radius = pow(abs(xoffset),2.)/(pow(abs(width.y),2.) + eps) + pow(abs(yoffset),2.)/(pow(abs(height.y),2.0) + eps);
-    //第二张脸
-    if (radius < 1.) {
-        ScaleFactor = Strength * (radius - 1.) * flag;
-        result = result + vec2(xoffset,yoffset) * ScaleFactor;
+    if(faceCount > 1)
+    {
+        vec2 resultToUse = result;
+        resultToUse.y = resultToUse.y/aspectRatio;
+        xoffset = resultToUse.x - centerPostionToUse[0][1];
+        yoffset = resultToUse.y - centerPostionToUse[1][1];
+        
+        radius = pow(abs(xoffset),2.)/(pow(abs(width.y),2.) + eps) + pow(abs(yoffset),2.)/(pow(abs(height.y),2.0) + eps);
+        //第二张脸
+        if (radius < 1.) {
+            ScaleFactor = Strength * (radius - 1.) * flag;
+            result = result + vec2(xoffset,yoffset) * ScaleFactor;
+        }
+        
+        resultToUse = result;
+        resultToUse.y = resultToUse.y/aspectRatio;
+        xoffset = resultToUse.x - centerPostionToUse[0][2];
+        yoffset = resultToUse.y - centerPostionToUse[1][2];
+        
+        radius = pow(abs(xoffset),2.)/(pow(abs(width.z),2.) + eps) + pow(abs(yoffset),2.)/(pow(abs(height.z),2.0) + eps);
+        //第三张脸
+        /*if (radius < 1.) {
+            ScaleFactor = Strength * (radius - 1.) * flag;
+            result = result + vec2(xoffset,yoffset) * ScaleFactor;
+        }
+        
+        resultToUse = result;
+        resultToUse.y = resultToUse.y/aspectRatio;
+        xoffset = resultToUse.x - centerPostionToUse[0][3];
+        yoffset = resultToUse.y - centerPostionToUse[1][3];
+        
+        radius = pow(abs(xoffset),2.)/(pow(abs(width.w),2.) + eps) + pow(abs(yoffset),2.)/(pow(abs(height.w),2.0) + eps);
+        //第四张脸
+        if (radius < 1.) {
+            ScaleFactor = Strength * (radius - 1.) * flag;
+            result = result + vec2(xoffset,yoffset) * ScaleFactor;
+        }*/
+
     }
-    
-    resultToUse = result;
-    resultToUse.y = resultToUse.y/aspectRatio;
-    xoffset = resultToUse.x - centerPostionToUse[0][2];
-    yoffset = resultToUse.y - centerPostionToUse[1][2];
-    
-    radius = pow(abs(xoffset),2.)/(pow(abs(width.z),2.) + eps) + pow(abs(yoffset),2.)/(pow(abs(height.z),2.0) + eps);
-    //第三张脸
-    if (radius < 1.) {
-        ScaleFactor = Strength * (radius - 1.) * flag;
-        result = result + vec2(xoffset,yoffset) * ScaleFactor;
-    }
-    
-    resultToUse = result;
-    resultToUse.y = resultToUse.y/aspectRatio;
-    xoffset = resultToUse.x - centerPostionToUse[0][3];
-    yoffset = resultToUse.y - centerPostionToUse[1][3];
-    
-    radius = pow(abs(xoffset),2.)/(pow(abs(width.w),2.) + eps) + pow(abs(yoffset),2.)/(pow(abs(height.w),2.0) + eps);
-    //第四张脸
-    if (radius < 1.) {
-        ScaleFactor = Strength * (radius - 1.) * flag;
-        result = result + vec2(xoffset,yoffset) * ScaleFactor;
-    }*/
     return result;
 }
 
@@ -224,90 +228,93 @@ vec2 expandXTextureRotate(vec2 currentTexture,mat4 point1,mat4 center,mat4 point
         
         float ScaleFactor = flag * Strength * (ofl - 1.0);
         result = result + offset * ScaleFactor;
+        //result = vec2(0.0,0.0);
     }
     
-    
-    /*currentPositionToUse.x = result.x;
-    currentPositionToUse.y = result.y/aspectRatio;
-    //第二张人脸
-    a1Value = (a1.y*a1.y+b1.y*b1.y) + eps;
-    b1Value = (a2.y*a2.y+b2.y*b2.y) + eps;
-    azhoupow = pow(abs(azhou.y),2.) + eps;
-    bzhoupow = pow(abs(bzhou.y),2.) + eps;
-    al=abs(a1.y*currentPositionToUse.x+b1.y*currentPositionToUse.y+c1.y)/sqrt(a1Value);
-    bl=abs(a2.y*currentPositionToUse.x+b2.y*currentPositionToUse.y+c2.y)/sqrt(b1Value);
-    
-    aValue = pow(abs(bl),2.)/azhoupow;
-    bValue = pow(abs(al),2.)/bzhoupow;
-    
-    ofl = aValue + bValue;
-    if(ofl > 0. && ofl<=1.0)
+    if(faceCount > 1)
     {
-        vec2 offset = currentPositionToUse - vec2(centerPostionToUse[0][1],centerPostionToUse[1][1]);
-        //横向变形，垂足计算
-        float cx=(b2.y*b2.y*currentPositionToUse.x-a2.y*b2.y*currentPositionToUse.y-a2.y*c2.y)/b1Value;
-        float cy=(a2.y*a2.y*currentPositionToUse.y-a2.y*b2.y*currentPositionToUse.x-b2.y*c2.y)/b1Value;
-        offset.x = currentPositionToUse.x - xOrXY * cx;
-        offset.y = currentPositionToUse.y - xOrXY * cy;
+        currentPositionToUse.x = result.x;
+        currentPositionToUse.y = result.y/aspectRatio;
+        //第二张人脸
+        a1Value = (a1.y*a1.y+b1.y*b1.y) + eps;
+        b1Value = (a2.y*a2.y+b2.y*b2.y) + eps;
+        azhoupow = pow(abs(azhou.y),2.) + eps;
+        bzhoupow = pow(abs(bzhou.y),2.) + eps;
+        al=abs(a1.y*currentPositionToUse.x+b1.y*currentPositionToUse.y+c1.y)/sqrt(a1Value);
+        bl=abs(a2.y*currentPositionToUse.x+b2.y*currentPositionToUse.y+c2.y)/sqrt(b1Value);
         
-        float ScaleFactor = flag * Strength * (ofl - 1.0);
-        result = result + offset * ScaleFactor;
+        aValue = pow(abs(bl),2.)/azhoupow;
+        bValue = pow(abs(al),2.)/bzhoupow;
+        
+        ofl = aValue + bValue;
+        if(ofl > 0. && ofl<=1.0)
+        {
+            vec2 offset = currentPositionToUse - vec2(centerPostionToUse[0][1],centerPostionToUse[1][1]);
+            //横向变形，垂足计算
+            float cx=(b2.y*b2.y*currentPositionToUse.x-a2.y*b2.y*currentPositionToUse.y-a2.y*c2.y)/b1Value;
+            float cy=(a2.y*a2.y*currentPositionToUse.y-a2.y*b2.y*currentPositionToUse.x-b2.y*c2.y)/b1Value;
+            offset.x = currentPositionToUse.x - xOrXY * cx;
+            offset.y = currentPositionToUse.y - xOrXY * cy;
+            
+            float ScaleFactor = flag * Strength * (ofl - 1.0);
+            result = result + offset * ScaleFactor;
+        }
+        
+        /*currentPositionToUse.x = result.x;
+        currentPositionToUse.y = result.y/aspectRatio;
+        //第三张人脸
+        a1Value = (a1.z*a1.z+b1.z*b1.z) + eps;
+        b1Value = (a2.z*a2.z+b2.z*b2.z) + eps;
+        azhoupow = pow(abs(azhou.z),2.) + eps;
+        bzhoupow = pow(abs(bzhou.z),2.) + eps;
+        al=abs(a1.z*currentPositionToUse.x+b1.z*currentPositionToUse.y+c1.z)/sqrt(a1Value);
+        bl=abs(a2.z*currentPositionToUse.x+b2.z*currentPositionToUse.y+c2.z)/sqrt(b1Value);
+        
+        aValue = pow(abs(bl),2.)/azhoupow;
+        bValue = pow(abs(al),2.)/bzhoupow;
+        
+        ofl = aValue + bValue;
+        if(ofl > 0. && ofl<=1.0)
+        {
+            vec2 offset = currentPositionToUse - vec2(centerPostionToUse[0][2],centerPostionToUse[1][2]);
+            //横向变形，垂足计算
+            float cx=(b2.z*b2.z*currentPositionToUse.x-a2.z*b2.z*currentPositionToUse.y-a2.z*c2.z)/b1Value;
+            float cy=(a2.z*a2.z*currentPositionToUse.y-a2.z*b2.z*currentPositionToUse.x-b2.z*c2.z)/b1Value;
+            offset.x = currentPositionToUse.x - xOrXY * cx;
+            offset.y = currentPositionToUse.y - xOrXY * cy;
+            
+            float ScaleFactor = flag * Strength * (ofl - 1.0);
+            result = result + offset * ScaleFactor;
+        }
+        
+        
+        currentPositionToUse.x = result.x;
+        currentPositionToUse.y = result.y/aspectRatio;
+        //第四张人脸
+        a1Value = (a1.w*a1.w+b1.w*b1.w) + eps;
+        b1Value = (a2.w*a2.w+b2.w*b2.w) + eps;
+        azhoupow = pow(abs(azhou.w),2.) + eps;
+        bzhoupow = pow(abs(bzhou.w),2.) + eps;
+        al=abs(a1.w*currentPositionToUse.x+b1.w*currentPositionToUse.y+c1.w)/sqrt(a1Value);
+        bl=abs(a2.w*currentPositionToUse.x+b2.w*currentPositionToUse.y+c2.w)/sqrt(b1Value);
+        
+        aValue = pow(abs(bl),2.)/azhoupow;
+        bValue = pow(abs(al),2.)/bzhoupow;
+        
+        ofl = aValue + bValue;
+        if(ofl > 0. && ofl<=1.0)
+        {
+            vec2 offset = currentPositionToUse - vec2(centerPostionToUse[0][3],centerPostionToUse[1][3]);
+            //横向变形，垂足计算
+            float cx=(b2.w*b2.w*currentPositionToUse.x-a2.w*b2.w*currentPositionToUse.y-a2.w*c2.w)/b1Value;
+            float cy=(a2.w*a2.w*currentPositionToUse.y-a2.w*b2.w*currentPositionToUse.x-b2.w*c2.w)/b1Value;
+            offset.x = currentPositionToUse.x - xOrXY * cx;
+            offset.y = currentPositionToUse.y - xOrXY * cy;
+            
+            float ScaleFactor = flag * Strength * (ofl - 1.0);
+            result = result + offset * ScaleFactor;
+        }*/
     }
-    
-    currentPositionToUse.x = result.x;
-    currentPositionToUse.y = result.y/aspectRatio;
-    //第三张人脸
-    a1Value = (a1.z*a1.z+b1.z*b1.z) + eps;
-    b1Value = (a2.z*a2.z+b2.z*b2.z) + eps;
-    azhoupow = pow(abs(azhou.z),2.) + eps;
-    bzhoupow = pow(abs(bzhou.z),2.) + eps;
-    al=abs(a1.z*currentPositionToUse.x+b1.z*currentPositionToUse.y+c1.z)/sqrt(a1Value);
-    bl=abs(a2.z*currentPositionToUse.x+b2.z*currentPositionToUse.y+c2.z)/sqrt(b1Value);
-    
-    aValue = pow(abs(bl),2.)/azhoupow;
-    bValue = pow(abs(al),2.)/bzhoupow;
-    
-    ofl = aValue + bValue;
-    if(ofl > 0. && ofl<=1.0)
-    {
-        vec2 offset = currentPositionToUse - vec2(centerPostionToUse[0][2],centerPostionToUse[1][2]);
-        //横向变形，垂足计算
-        float cx=(b2.z*b2.z*currentPositionToUse.x-a2.z*b2.z*currentPositionToUse.y-a2.z*c2.z)/b1Value;
-        float cy=(a2.z*a2.z*currentPositionToUse.y-a2.z*b2.z*currentPositionToUse.x-b2.z*c2.z)/b1Value;
-        offset.x = currentPositionToUse.x - xOrXY * cx;
-        offset.y = currentPositionToUse.y - xOrXY * cy;
-        
-        float ScaleFactor = flag * Strength * (ofl - 1.0);
-        result = result + offset * ScaleFactor;
-    }
-    
-    
-    currentPositionToUse.x = result.x;
-    currentPositionToUse.y = result.y/aspectRatio;
-    //第四张人脸
-    a1Value = (a1.w*a1.w+b1.w*b1.w) + eps;
-    b1Value = (a2.w*a2.w+b2.w*b2.w) + eps;
-    azhoupow = pow(abs(azhou.w),2.) + eps;
-    bzhoupow = pow(abs(bzhou.w),2.) + eps;
-    al=abs(a1.w*currentPositionToUse.x+b1.w*currentPositionToUse.y+c1.w)/sqrt(a1Value);
-    bl=abs(a2.w*currentPositionToUse.x+b2.w*currentPositionToUse.y+c2.w)/sqrt(b1Value);
-    
-    aValue = pow(abs(bl),2.)/azhoupow;
-    bValue = pow(abs(al),2.)/bzhoupow;
-    
-    ofl = aValue + bValue;
-    if(ofl > 0. && ofl<=1.0)
-    {
-        vec2 offset = currentPositionToUse - vec2(centerPostionToUse[0][3],centerPostionToUse[1][3]);
-        //横向变形，垂足计算
-        float cx=(b2.w*b2.w*currentPositionToUse.x-a2.w*b2.w*currentPositionToUse.y-a2.w*c2.w)/b1Value;
-        float cy=(a2.w*a2.w*currentPositionToUse.y-a2.w*b2.w*currentPositionToUse.x-b2.w*c2.w)/b1Value;
-        offset.x = currentPositionToUse.x - xOrXY * cx;
-        offset.y = currentPositionToUse.y - xOrXY * cy;
-        
-        float ScaleFactor = flag * Strength * (ofl - 1.0);
-        result = result + offset * ScaleFactor;
-    }*/
     
     return result;
 }
@@ -345,22 +352,18 @@ vec2 expandYTexture(vec2 currentTexture,vec2 point1,vec2 point2,float aspectRati
     if(a2*curpoint.x+b2*curpoint.y+c2<0.0 && a3*curpoint.x+b3*curpoint.y+c3>0.0)
     {
         float cx,cy,bl,ofl;
-        
-        //        if (bzhouValue < 0.002) {
-        //            cx = curpoint.x;
-        //            cy = curpoint.y;
-        //            bl = ofl = 1.0;
-        //        }else{
         cx=(b2*b2*curpoint.x-a2*b2*curpoint.y-a2*c2)/(bzhouValue + eps);
         cy=(a2*a2*curpoint.y-a2*b2*curpoint.x-b2*c2)/(bzhouValue + eps);
         bl= abs(a2*curpoint.x+b2*curpoint.y+c2)/sqrt((bzhouValue + eps));
         ofl=bl*bl/(bzhou*bzhou + eps);
-        //        }
+
+        
         float xoffset = curpoint.x - cx;
         float yoffset = curpoint.y - cy;
         float ScaleFactor = -0.1*Strength*(ofl-1.0);
         
         result = result + vec2(xoffset,yoffset) * ScaleFactor;
+//        result = vec2(-1.0);
     }
     
     return result;
@@ -397,35 +400,38 @@ vec2  showFaceTest(vec2 currentTexture,float Strengtheye,float xscale,float ysca
     top[0][0] = top1.x;
     top[1][0] = top1.y;
     
-    //瘦脸——第二张
-    /*offset1 = vec2(xoffset * faceWidth.y,yoffset * faceWidth.y);
-    center1 = testCal(faceMorphP1[1],faceMorphCenter[1],faceMorphP3[1],top1,left1,offset1,aspectRatio);
-    left[0][1] = left1.x;
-    left[1][1] = left1.y;
-    center[0][1] = center1.x;
-    center[1][1] = center1.y;
-    top[0][1] = top1.x;
-    top[1][1] = top1.y;
-    
-    //瘦脸——第三张
-    offset1 = vec2(xoffset * faceWidth.z,yoffset * faceWidth.z);
-    center1 = testCal(faceMorphP1[2] ,faceMorphCenter[2],faceMorphP3[2],top1,left1,offset1,aspectRatio);
-    left[0][2] = left1.x;
-    left[1][2] = left1.y;
-    center[0][2] = center1.x;
-    center[1][2] = center1.y;
-    top[0][2] = top1.x;
-    top[1][2] = top1.y;
-    
-    //瘦脸——第四张
-    offset1 = vec2(xoffset * faceWidth.w,yoffset * faceWidth.w);
-    center1 = testCal(faceMorphP1[3],faceMorphCenter[3],faceMorphP3[3],top1,left1,offset1,aspectRatio);
-    left[0][3] = left1.x;
-    left[1][3] = left1.y;
-    center[0][3] = center1.x;
-    center[1][3] = center1.y;
-    top[0][3] = top1.x;
-    top[1][3] = top1.y;*/
+    if(faceCount > 1)
+    {
+        //瘦脸——第二张
+        offset1 = vec2(xoffset * faceWidth.y,yoffset * faceWidth.y);
+        center1 = testCal(faceMorphP1[1],faceMorphCenter[1],faceMorphP3[1],top1,left1,offset1,aspectRatio);
+        left[0][1] = left1.x;
+        left[1][1] = left1.y;
+        center[0][1] = center1.x;
+        center[1][1] = center1.y;
+        top[0][1] = top1.x;
+        top[1][1] = top1.y;
+        
+        //瘦脸——第三张
+        /*offset1 = vec2(xoffset * faceWidth.z,yoffset * faceWidth.z);
+        center1 = testCal(faceMorphP1[2] ,faceMorphCenter[2],faceMorphP3[2],top1,left1,offset1,aspectRatio);
+        left[0][2] = left1.x;
+        left[1][2] = left1.y;
+        center[0][2] = center1.x;
+        center[1][2] = center1.y;
+        top[0][2] = top1.x;
+        top[1][2] = top1.y;
+        
+        //瘦脸——第四张
+        offset1 = vec2(xoffset * faceWidth.w,yoffset * faceWidth.w);
+        center1 = testCal(faceMorphP1[3],faceMorphCenter[3],faceMorphP3[3],top1,left1,offset1,aspectRatio);
+        left[0][3] = left1.x;
+        left[1][3] = left1.y;
+        center[0][3] = center1.x;
+        center[1][3] = center1.y;
+        top[0][3] = top1.x;
+        top[1][3] = top1.y;*/
+    }
     
     //收缩，最后一个参数为1.0，表示只对x进行变化
     result = expandXTextureRotate(result,left,center,top,aspectRatio,StrengthX,StrengthY,-1.0,width,height,1.0);
@@ -473,7 +479,7 @@ void main()
         {
             currentTexture = ShowFaceEffectEx(currentTexture,1,faceStrengthY,facexoffset,faceyoffset,facewidth,rectHeight);
         }
-        else if(faceCount == 3)
+        /*else if(faceCount == 3)
         {
             currentTexture = ShowFaceEffectEx(currentTexture,1,faceStrengthY,facexoffset,faceyoffset,facewidth,rectHeight);
             currentTexture = ShowFaceEffectEx(currentTexture,2,faceStrengthY,facexoffset,faceyoffset,facewidth,rectHeight);
@@ -483,7 +489,7 @@ void main()
             currentTexture = ShowFaceEffectEx(currentTexture,1,faceStrengthY,facexoffset,faceyoffset,facewidth,rectHeight);
             currentTexture = ShowFaceEffectEx(currentTexture,2,faceStrengthY,facexoffset,faceyoffset,facewidth,rectHeight);
             currentTexture = ShowFaceEffectEx(currentTexture,3,faceStrengthY,facexoffset,faceyoffset,facewidth,rectHeight);
-        }
+        }*/
     }
     gl_FragColor = texture2D(inputImageTexture,currentTexture);
 }
