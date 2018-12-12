@@ -1,7 +1,6 @@
 package com.douyaim.effect.effectimp;
 
 import com.google.gson.annotations.SerializedName;
-
 import java.io.Serializable;
 
 /**
@@ -10,16 +9,22 @@ import java.io.Serializable;
 public class ZZEffectFaceItem_v2 implements Serializable {
 
     private int start;
+    private int end;
+    private int action;
+    private float duration;
     @SerializedName("vertex")
     private String vertexName;
     @SerializedName("fragment")
     private String fragmentName;
     private int count;
+    private ZZPropertyItem propertyItem;
     @SerializedName("extra")
     private float[] extras;
-    @SerializedName("note")
-    private String note;
     private String dirPath;
+    private float[] framePoints;
+    private float[] frameRotates;
+    private float[] fillColor;
+    private int frameCount;
 
     public int getStart() {
         return start;
@@ -69,12 +74,67 @@ public class ZZEffectFaceItem_v2 implements Serializable {
         this.extras = extras;
     }
 
-    public String getNote() {
-        return note;
+    public int getEnd() {
+        return end;
     }
 
-    public void setNote(String note) {
-        this.note = note;
+    public void setEnd(int end) {
+        this.end = end;
     }
 
+    public int getAction() {
+        return action;
+    }
+
+    public void setAction(int action) {
+        this.action = action;
+    }
+
+    public float getDuration() {
+        return duration;
+    }
+
+    public void setDuration(float duration) {
+        this.duration = duration;
+    }
+
+    public ZZPropertyItem getPropertyItem() {
+        return propertyItem;
+    }
+
+    public void setPropertyItem(ZZPropertyItem propertyItem) {
+        this.propertyItem = propertyItem;
+    }
+
+    public float[] getFramePoints() {
+        return framePoints;
+    }
+
+    public void setFramePoints(float[] framePoints) {
+        this.framePoints = framePoints;
+    }
+
+    public float[] getFrameRotates() {
+        return frameRotates;
+    }
+
+    public void setFrameRotates(float[] frameRotates) {
+        this.frameRotates = frameRotates;
+    }
+
+    public float[] getFillColor() {
+        return fillColor;
+    }
+
+    public void setFillColor(float[] fillColor) {
+        this.fillColor = fillColor;
+    }
+
+    public int getFrameCount() {
+        return frameCount;
+    }
+
+    public void setFrameCount(int frameCount) {
+        this.frameCount = frameCount;
+    }
 }

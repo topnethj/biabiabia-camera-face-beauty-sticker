@@ -8,6 +8,7 @@ import com.douyaim.effect.effectimp.ZZEffectConfig_v2;
 import com.douyaim.effect.effectimp.ZZEffectTexCoorConfig;
 import com.douyaim.effect.effectimp.ZZEffectTexCoorItem;
 import com.douyaim.effect.effectimp.ZZEffectTextureManager;
+import com.douyaim.effect.face.ZZFaceManager_v2;
 import com.douyaim.effect.face.ZZFaceResult;
 import com.douyaim.effect.model.AndroidSize;
 import com.douyaim.effect.utils.OpenGlUtils;
@@ -20,9 +21,7 @@ import java.util.List;
  */
 public class ZZEffectFilter_v2 extends GPUImageFilter {
 
-    boolean isRuning;
     boolean isFace;
-    boolean has3D = false;
     AndroidSize bufferSize;
     AndroidSize frameSize;
     String dirPath;
@@ -101,11 +100,6 @@ public class ZZEffectFilter_v2 extends GPUImageFilter {
             }
 
             //TODO:3D初始化调试
-            //if(dirPath.equals("/storage/emulated/0/Android/isFriend/com.douyaim.qsapp/cache/effect/4a721b1004e5bc5c/")){
-            //    _engine3d = new ZZEffect3DEngine_v2(bufferSize);
-            //    _engine3d.init();
-            //    has3D = true;
-            //}
 
             //贴纸
             if(effectConfig_v2.tieZhiItem != null){
@@ -120,22 +114,10 @@ public class ZZEffectFilter_v2 extends GPUImageFilter {
                 _audioEngine = new ZZEffectAudioEngine_v2();
                 _audioEngine.initWithItems(effectConfig_v2.audioItems);
             }
-
-            //blend
-            int sourceCount = 0;
-            if (effectConfig_v2.faceItem != null) {
-                sourceCount++;
-            }
-            if (effectConfig_v2.item2ds != null && effectConfig_v2.item2ds.size() > 0) {
-                sourceCount++; // 2d
-            }
         }
 
-        if(!has3D){
-            blendFilter = ZZEffectBlendEngine_v2.genBlendFilterWithItem(null, 2);
-        }else{
-            blendFilter = ZZEffectBlendEngine_v2.genBlendFilterWithItem(null, 3);
-        }
+        blendFilter = ZZEffectBlendEngine_v2.genBlendFilterWithItem(null, 2);
+
         blendFilter.init();
         blendFilter.onDisplaySizeChanged(bufferSize.width, bufferSize.height);
         blendFilter.onInputSizeChanged(frameSize.width, frameSize.height);
@@ -146,7 +128,13 @@ public class ZZEffectFilter_v2 extends GPUImageFilter {
         int t2 = OpenGlUtils.NO_TEXTURE;
         int t3 = OpenGlUtils.NO_TEXTURE;
 
-        if(_faceFilter != null && faceResult.size() > 0){
+        if (effectConfig_v2 == null) {
+            return new int[]{t1,t2,t3};
+        }
+
+        if(_faceFilter != null){
+            //face缩放和平移的因子
+            _faceFilter.updateSizeWithScaleX(effectConfig_v2.scaleX, effectConfig_v2.scaleY, effectConfig_v2.posX, effectConfig_v2.posY);
             _faceFilter.updateWithFaceResults(faceResult);
             t1 = _faceFilter.onDrawFrame(my_ttid);
         }
@@ -155,6 +143,9 @@ public class ZZEffectFilter_v2 extends GPUImageFilter {
             _tieZhiFilter.update(faceResult);
             t1 = _tieZhiFilter.onDrawFrame(my_ttid);
         }
+
+        ZZFaceManager_v2.getZZFaceManager().turnFaceResultWithScaleX(faceResult, effectConfig_v2.scaleX,
+                effectConfig_v2.scaleY, effectConfig_v2.posX, effectConfig_v2.posY);
 
         if(_engine2d != null){
             _engine2d.renderStart();
@@ -179,10 +170,7 @@ public class ZZEffectFilter_v2 extends GPUImageFilter {
     }
 
     public void blend(int[] textures, FloatBuffer vertexBuffer, FloatBuffer textureBuffer) {
-        if(!has3D){
-            ((GPUImageTwoInputFilter)blendFilter).mFilterSourceTexture2 = textures[1];
-        }else {
-        }
+        ((GPUImageTwoInputFilter)blendFilter).mFilterSourceTexture2 = textures[1];
         if(vertexBuffer != null && textureBuffer != null){
             blendFilter.onDrawFrame(textures[0], vertexBuffer, textureBuffer);
         }else{
@@ -219,5 +207,4 @@ public class ZZEffectFilter_v2 extends GPUImageFilter {
 
     public void dealloc() {
     }
-
 }

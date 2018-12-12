@@ -47,6 +47,7 @@ public class ZZEffect2DElement_v2 {
     double[] _startTimes;
     int[] _animatings;
     int _curFaceIndex;
+    Map<Integer, Float> _strikeTime = new HashMap<>();
 
     ZZEffectControl_2d _control_2d;
 
@@ -99,6 +100,8 @@ public class ZZEffect2DElement_v2 {
 
         _faceStatusFourFace = new HashMap<>();
 
+        initStrikeTimeWithFace();
+
         ZZEffectTexCoorItem texCoorItem = ZZEffectTextureManager.getZZEffectTextureManager().getTexCoorByName(_control_2d.getFrameName());
         if(texCoorItem != null){
             texture = ZZEffectTextureManager.getZZEffectTextureManager().getTextureByPath(_item.getDirPath() + texCoorItem.getImageName());
@@ -136,6 +139,8 @@ public class ZZEffect2DElement_v2 {
         //_faceStatus = newStatus;
 
         _faceStatusFourFace.put(""+_curFaceIndex, newStatus);
+
+        _control_2d.updateStrikeTime(_strikeTime.get(_curFaceIndex));
 
         _control_2d.updateFaceResult(_facePoints, _times[_curFaceIndex], _pitch, _yaw, _roll, _animatings[_curFaceIndex] == 0 ? false : true);
     }
@@ -179,9 +184,12 @@ public class ZZEffect2DElement_v2 {
                         _animatings[_curFaceIndex] = 1;
                     }
                 } else { // 上一帧不满足触发条件
-                    _startTimes[_curFaceIndex] = now;
+                    if(!(_item.getIsAction() == 1 && _item.isTimeNoRepeate())) {
+                        _startTimes[_curFaceIndex] = now;
+                    }
                     time = (float)(now - _startTimes[_curFaceIndex]) / 1000f;
                     _animatings[_curFaceIndex] = 1;
+                    noteStrikeTime(time, _curFaceIndex);
                 }
             }
         } else {
@@ -228,6 +236,10 @@ public class ZZEffect2DElement_v2 {
             }
             _curFaceIndex = -1;
         }
+
+        initStrikeTimeWithFace();
+        //_control_2d.updateStrikeTime(_strikeTime.get(_curFaceIndex));
+        _control_2d.updateStrikeTime(0);//TODO:
 
         //_control_2d.updateFaceResult(null, _times[_curFaceIndex], 0.0f, 0.0f, 0.0f, false);
         _control_2d.updateFaceResult(null, 0.0f, 0.0f, 0.0f, 0.0f, false);//TODO:
@@ -352,6 +364,17 @@ public class ZZEffect2DElement_v2 {
         _alphaUniform = GLES20.glGetUniformLocation(_program, "alphaFactor");
     }
 
+    private void initStrikeTimeWithFace() {
+        _strikeTime.clear();
+        for (int i = 0; i < ZZEffectCommon.ZZNumberOfFaceAndScreen; i++) {
+            noteStrikeTime(0, i);
+        }
+    }
+
+    private void noteStrikeTime(float time, int faceindex) {
+        _strikeTime.put(faceindex, time);
+    }
+
     void reset() {
         _animating = false;
         _faceStatus = ZZFaceResult.ZZ_FACESTATUS_UNKNOWN;
@@ -367,7 +390,10 @@ public class ZZEffect2DElement_v2 {
         _startTimes = null;
         _animatings = null;
         _curFaceIndex = -1;
-        _faceStatusFourFace.clear();
+        if (_faceStatusFourFace != null) {
+            _faceStatusFourFace.clear();
+        }
+        initStrikeTimeWithFace();
     }
 
     @Override

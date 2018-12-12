@@ -27,7 +27,12 @@ public class ZZEffectAlphaAffector extends ZZEffectAffector {
         if (time < m_startTime) {
             return false;
         }
-        float currenttime = time % m_totalTime;
+        float currenttime;
+        if ((m_totalTime - 0.001) < 0.0) {
+            currenttime = time;
+        } else {
+            currenttime = time % m_totalTime;
+        }
         if (currenttime >= m_startTime && currenttime < m_endTime) {
             float frametime = currenttime - m_startTime;
             if (m_bNeedReverse) {

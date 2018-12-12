@@ -137,6 +137,18 @@ public class ZZFaceResult {
         this.roll = -(float)rtst[2];
     }
 
+    public void turn(@NonNull PointF[] facePoints){
+        int plen = facePoints.length;
+        points = new PointF[plen];
+        for(int i = 0; i < plen; i++){
+            points[i] = new PointF();
+            //points[i].x = (facePoints[i].x - width / 2) / 2 / width;
+            //points[i].y = (height / 2 - facePoints[i].y) / 2 / height;
+            points[i].x = facePoints[i].x / width;
+            points[i].y = facePoints[i].y / height;
+        }
+    }
+
     private void turnPoint(PointF cvFacePoint, int i){
         if(isFront){
             points[_INDEXS[i]] = new PointF();

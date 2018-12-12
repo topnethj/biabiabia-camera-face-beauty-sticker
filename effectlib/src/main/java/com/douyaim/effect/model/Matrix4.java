@@ -15,6 +15,7 @@ package com.douyaim.effect.model;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.Size;
+
 import java.util.Arrays;
 
 /**
@@ -66,9 +67,6 @@ public final class Matrix4 implements Cloneable {
     //speed for memory and it is considered a small enough memory increase to be acceptable.
     @NonNull @Size(16) private double[]   mTmp   = new double[16]; //A scratch matrix
     @NonNull @Size(16) private float[]    mFloat = new float[16]; //A float copy of the values, used for sending to GL.
-    @NonNull private final     Vector3    mVec1  = new Vector3(); //A scratch Vector3
-    @NonNull private final     Vector3    mVec2  = new Vector3(); //A scratch Vector3
-    @NonNull private final     Vector3    mVec3  = new Vector3(); //A scratch Vector3
     @Nullable private Matrix4 mMatrix; //A scratch Matrix4
 
     /**
@@ -96,6 +94,163 @@ public final class Matrix4 implements Cloneable {
      */
     public Matrix4(@NonNull @Size(min = 16) double[] matrix) {
         setAll(matrix);
+    }
+
+
+    /**
+     * Sets this {@link Matrix4} to an identity matrix.
+     *
+     * @return A reference to this {@link Matrix4} to facilitate chaining.
+     */
+    @NonNull
+    public Matrix4 identity() {
+        // @formatter:off
+        m[M00] = 1;	m[M10] = 0;	m[M20] = 0;	m[M30] = 0;
+        m[M01] = 0;	m[M11] = 1;	m[M21] = 0;	m[M31] = 0;
+        m[M02] = 0;	m[M12] = 0;	m[M22] = 1;	m[M32] = 0;
+        m[M03] = 0;	m[M13] = 0;	m[M23] = 0;	m[M33] = 1;
+        return this;
+        // @formatter:on
+    }
+
+    /**
+     * Constructs a new {@link Matrix4} based on the provided float array. The array length
+     * must be greater than or equal to 16 and the array will be copied from the 0 index.
+     *
+     * @param matrix float array containing the values for the matrix in column major order.
+     *               The array is not modified or referenced after this constructor completes.
+     */
+    public Matrix4(@NonNull @Size(min = 16) float[] matrix) {
+        this(convertFloatsToDoubles(matrix));
+    }
+
+    /**
+     * Multiplies this {@link Matrix4} with the given one, storing the result in this {@link Matrix}.
+     * <pre>
+     * A.multiply(B) results in A = AB.
+     * </pre>
+     *
+     * @param matrix {@link Matrix4} The RHS {@link Matrix4}.
+     *
+     * @return A reference to this {@link Matrix4} to facilitate chaining.
+     */
+    @NonNull
+    public Matrix4 multiply(@NonNull Matrix4 matrix) {
+        System.arraycopy(m, 0, mTmp, 0, 16);
+        multiplyMM(m, 0, mTmp, 0, matrix.getDoubleValues(), 0);
+        return this;
+    }
+
+    /**
+     * Left multiplies this {@link Matrix4} with the given one, storing the result in this {@link Matrix}.
+     * <pre>
+     * A.leftMultiply(B) results in A = BA.
+     * </pre>
+     *
+     * @param matrix {@link Matrix4} The LHS {@link Matrix4}.
+     *
+     * @return A reference to this {@link Matrix4} to facilitate chaining.
+     */
+    @NonNull
+    public Matrix4 leftMultiply(@NonNull Matrix4 matrix) {
+        System.arraycopy(m, 0, mTmp, 0, 16);
+        multiplyMM(m, 0, matrix.getDoubleValues(), 0, mTmp, 0);
+        return this;
+    }
+
+    /**
+     * Multiplies each element of this {@link Matrix4} by the provided factor.
+     *
+     * @param value double The multiplication factor.
+     *
+     * @return A reference to this {@link Matrix4} to facilitate chaining.
+     */
+    @NonNull
+    public Matrix4 multiply(double value) {
+        for (int i = 0; i < m.length; ++i) {
+            m[i] *= value;
+        }
+        return this;
+    }
+
+    /**
+     * Multiply two 4x4 matrices together and store the result in a third 4x4
+     * matrix. In matrix notation: result = lhs x rhs. Due to the way
+     * matrix multiplication works, the result matrix will have the same
+     * effect as first multiplying by the rhs matrix, then multiplying by
+     * the lhs matrix. This is the opposite of what you might expect.
+     *
+     * The same double array may be passed for result, lhs, and/or rhs. However,
+     * the result element values are undefined if the result elements overlap
+     * either the lhs or rhs elements.
+     *
+     * @param result The double array that holds the result.
+     * @param resultOffset The offset into the result array where the result is
+     *        stored.
+     * @param lhs The double array that holds the left-hand-side matrix.
+     * @param lhsOffset The offset into the lhs array where the lhs is stored
+     * @param rhs The double array that holds the right-hand-side matrix.
+     * @param rhsOffset The offset into the rhs array where the rhs is stored.
+     *
+     * @throws IllegalArgumentException if result, lhs, or rhs are null, or if
+     * resultOffset + 16 > result.length or lhsOffset + 16 > lhs.length or
+     * rhsOffset + 16 > rhs.length.
+     */
+    public static void multiplyMM(double[] result, int resultOffset,
+                                  double[] lhs, int lhsOffset, double[] rhs, int rhsOffset) {
+        String message = null;
+        if (result == null) {
+            message = "Result matrix can not be null.";
+        } else if (lhs == null) {
+            message = "Left hand side matrix can not be null.";
+        } else if (rhs == null) {
+            message = "Right hand side matrix can not be null.";
+        } else if ((resultOffset + 16) > result.length) {
+            message = "Specified result offset would overflow the passed result matrix.";
+        } else if ((lhsOffset + 16) > lhs.length) {
+            message = "Specified left hand side offset would overflow the passed lhs matrix.";
+        } else if ((rhsOffset + 16) > rhs.length) {
+            message = "Specified right hand side offset would overflow the passed rhs matrix.";
+        }
+        if (message != null) {
+            throw new IllegalArgumentException(message);
+        }
+
+        double sum = 0;
+        for (int i = 0; i < 4; ++i) { //Row
+            for (int j = 0; j < 4; ++j) { //Column
+                sum = 0;
+                for (int k = 0; k < 4; ++k) {
+                    sum += lhs[i+4*k+lhsOffset] * rhs[4*j+k+rhsOffset];
+                }
+                result[i+4*j+resultOffset] = sum;
+            }
+        }
+    }
+
+    /**
+     * Copies the backing array of this {@link Matrix4} into a float array and returns it.
+     *
+     * @return float array containing a copy of the backing array. The returned array is owned
+     * by this {@link Matrix4} and is subject to change as the implementation sees fit.
+     */
+    @NonNull
+    @Size(16)
+    public float[] getFloatValues() {
+        convertDoublesToFloats(m, mFloat);
+        return mFloat;
+    }
+
+    /**
+     * Returns the backing array of this {@link Matrix4}.
+     *
+     * @return double array containing the backing array. The returned array is owned
+     * by this {@link Matrix4} and is subject to change as the implementation sees fit.
+     */
+    @NonNull
+    @Size(16)
+    public double[] getDoubleValues() {
+        return m;
     }
 
     /**
@@ -136,149 +291,6 @@ public final class Matrix4 implements Cloneable {
 		m[12] = matrix[12];	m[13] = matrix[13];	m[14] = matrix[14];	m[15] = matrix[15];
 		return this;
         // @formatter:on
-    }
-
-    /**
-     * Sets this {@link Matrix4} to an identity matrix.
-     *
-     * @return A reference to this {@link Matrix4} to facilitate chaining.
-     */
-    @NonNull
-    public Matrix4 identity() {
-        // @formatter:off
-		m[M00] = 1;	m[M10] = 0;	m[M20] = 0;	m[M30] = 0;
-		m[M01] = 0;	m[M11] = 1;	m[M21] = 0;	m[M31] = 0;
-		m[M02] = 0;	m[M12] = 0;	m[M22] = 1;	m[M32] = 0;
-		m[M03] = 0;	m[M13] = 0;	m[M23] = 0;	m[M33] = 1;
-		return this;
-        // @formatter:on
-    }
-
-    /**
-     * Sets all elements of this {@link Matrix4} to zero.
-     *
-     * @return A reference to this {@link Matrix4} to facilitate chaining.
-     */
-    @NonNull
-    public Matrix4 zero() {
-        for (int i = 0; i < 16; ++i) {
-            m[i] = 0;
-        }
-        return this;
-    }
-
-    /**
-     * Multiplies this {@link Matrix4} with the given one, storing the result in this {@link Matrix}.
-     * <pre>
-     * A.multiply(B) results in A = AB.
-     * </pre>
-     *
-     * @param matrix {@link Matrix4} The RHS {@link Matrix4}.
-     *
-     * @return A reference to this {@link Matrix4} to facilitate chaining.
-     */
-    @NonNull
-    public Matrix4 multiply(@NonNull Matrix4 matrix) {
-        System.arraycopy(m, 0, mTmp, 0, 16);
-        multiplyMM(m, 0, mTmp, 0, matrix.getDoubleValues(), 0);
-        return this;
-    }
-
-    /**
-     * Left multiplies this {@link Matrix4} with the given one, storing the result in this {@link Matrix}.
-     * <pre>
-     * A.leftMultiply(B) results in A = BA.
-     * </pre>
-     *
-     * @param matrix {@link Matrix4} The LHS {@link Matrix4}.
-     *
-     * @return A reference to this {@link Matrix4} to facilitate chaining.
-     */
-    @NonNull
-    public Matrix4 leftMultiply(@NonNull Matrix4 matrix) {
-        System.arraycopy(m, 0, mTmp, 0, 16);
-        multiplyMM(m, 0, matrix.getDoubleValues(), 0, mTmp, 0);
-        return this;
-    }
-
-    private void multiplyMM(double[] result, int resultOffset,
-                                  double[] lhs, int lhsOffset, double[] rhs, int rhsOffset) {
-        String message = null;
-        if (result == null) {
-            message = "Result matrix can not be null.";
-        } else if (lhs == null) {
-            message = "Left hand side matrix can not be null.";
-        } else if (rhs == null) {
-            message = "Right hand side matrix can not be null.";
-        } else if ((resultOffset + 16) > result.length) {
-            message = "Specified result offset would overflow the passed result matrix.";
-        } else if ((lhsOffset + 16) > lhs.length) {
-            message = "Specified left hand side offset would overflow the passed lhs matrix.";
-        } else if ((rhsOffset + 16) > rhs.length) {
-            message = "Specified right hand side offset would overflow the passed rhs matrix.";
-        }
-        if (message != null) {
-            throw new IllegalArgumentException(message);
-        }
-
-        double sum = 0;
-        for (int i = 0; i < 4; ++i) { //Row
-            for (int j = 0; j < 4; ++j) { //Column
-                sum = 0;
-                for (int k = 0; k < 4; ++k) {
-                    sum += lhs[i+4*k+lhsOffset] * rhs[4*j+k+rhsOffset];
-                }
-                result[i+4*j+resultOffset] = sum;
-            }
-        }
-    }
-
-    /**
-     * Multiplies each element of this {@link Matrix4} by the provided factor.
-     *
-     * @param value double The multiplication factor.
-     *
-     * @return A reference to this {@link Matrix4} to facilitate chaining.
-     */
-    @NonNull
-    public Matrix4 multiply(double value) {
-        for (int i = 0; i < m.length; ++i) {
-            m[i] *= value;
-        }
-        return this;
-    }
-
-    /**
-     * Copies the backing array of this {@link Matrix4} into a float array and returns it.
-     *
-     * @return float array containing a copy of the backing array. The returned array is owned
-     * by this {@link Matrix4} and is subject to change as the implementation sees fit.
-     */
-    @NonNull
-    @Size(16)
-    public float[] getFloatValues() {
-        convertDoublesToFloats(m, mFloat);
-        return mFloat;
-    }
-
-    private float[] convertDoublesToFloats(double[] input, float[] output) {
-        if (input == null || output == null) return output;
-        for (int i = 0; i < input.length; ++i) {
-            output[i] = (float) input[i];
-        }
-        return output;
-    }
-
-    /**
-     * Returns the backing array of this {@link Matrix4}.
-     *
-     * @return double array containing the backing array. The returned array is owned
-     * by this {@link Matrix4} and is subject to change as the implementation sees fit.
-     */
-    @NonNull
-    @Size(16)
-    public double[] getDoubleValues() {
-        return m;
     }
 
     /**
@@ -348,5 +360,65 @@ public final class Matrix4 implements Cloneable {
                + m[M20] + "|" + m[M21] + "|" + m[M22] + "|" + m[M23] + "]\n["
                + m[M30] + "|" + m[M31] + "|" + m[M32] + "|" + m[M33] + "]\n";
                // @formatter:on
+    }
+
+    /**
+     * Converts an array of floats to an array of doubles, using the provided output array.
+     *
+     * @param input float[] array to be converted.
+     * @param output double[] array to store the result in.
+     * @return float[] a reference to output. Returned for convenience.
+     */
+    public static double[] convertFloatsToDoubles(float[] input, double[] output) {
+        if (input == null || output == null) return output;
+        for (int i = 0; i < input.length; ++i) {
+            output[i] = (double) input[i];
+        }
+        return output;
+    }
+
+    /**
+     * Converts an array of floats to an array of doubles, allocating a new array.
+     *
+     * @param input double[] array to be converted.
+     * @return float[] array with the result. Will be null if input was null.
+     */
+    public static double[] convertFloatsToDoubles(float[] input) {
+        if (input == null) return null;
+        double[] output = new double[input.length];
+        for (int i = 0; i < input.length; ++i) {
+            output[i] = (double) input[i];
+        }
+        return output;
+    }
+
+    /**
+     * Converts an array of doubles to an array of floats, using the provided output array.
+     *
+     * @param input double[] array to be converted.
+     * @param output float[] array to store the result in.
+     * @return float[] a reference to output. Returned for convenience.
+     */
+    public static float[] convertDoublesToFloats(double[] input, float[] output) {
+        if (input == null || output == null) return output;
+        for (int i = 0; i < input.length; ++i) {
+            output[i] = (float) input[i];
+        }
+        return output;
+    }
+
+    /**
+     * Converts an array of doubles to an array of floats, allocating a new array.
+     *
+     * @param input double[] array to be converted.
+     * @return float[] array with the result. Will be null if input was null.
+     */
+    public static float[] convertDoublesToFloats(double[] input) {
+        if (input == null) return null;
+        float[] output = new float[input.length];
+        for (int i = 0; i < input.length; ++i) {
+            output[i] = (float) input[i];
+        }
+        return output;
     }
 }

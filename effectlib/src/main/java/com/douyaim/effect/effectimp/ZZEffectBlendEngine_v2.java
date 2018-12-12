@@ -26,21 +26,21 @@ public class ZZEffectBlendEngine_v2 {
 
         if(vshPath == null || fshPath == null) {
             if(count == 1){
+                vshPath = "resource/blend1.vsh";
+                fshPath = "resource/blend1.fsh";
             }else if(count == 2){
                 vshPath = "resource/blend2.vsh";
                 fshPath = "resource/blend2.fsh";
             }else if(count == 3){
+                vshPath = "resource/blend3.vsh";
+                fshPath = "resource/blend3.fsh";
             }
         }
 
         String vshString = OpenGlUtils.readShaderFromAssetsFile(LibApp.getAppContext(), vshPath);
         String fshString = OpenGlUtils.readShaderFromAssetsFile(LibApp.getAppContext(), fshPath);
 
-        GPUImageFilter blendFilter = null;
-        if(count == 2){
-            blendFilter = new GPUImageTwoInputFilter(vshString, fshString, false);
-        }else if(count == 3){
-        }
+        GPUImageFilter blendFilter = new GPUImageTwoInputFilter(vshString, fshString, false);
 
         return blendFilter;
     }

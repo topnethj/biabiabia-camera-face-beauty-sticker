@@ -6,7 +6,7 @@ import com.douyaim.effect.model.Vector2;
  * Created by hj on 17/3/17.
  */
 
-public class ZZEffectFacePositionAffector extends ZZEffectPositionAffector {
+public class ZZEffectFacePositionAffector extends ZZEffectAffector {
 
     private String m_StartBindPoint;
     private String m_EndBindPoint;
@@ -136,82 +136,66 @@ public class ZZEffectFacePositionAffector extends ZZEffectPositionAffector {
         this.m_vEndOffset = m_vEndOffset;
     }
 
-    @Override
     public Vector2 getM_vStartPos() {
         return m_vStartPos;
     }
 
-    @Override
     public void setM_vStartPos(Vector2 m_vStartPos) {
         this.m_vStartPos = m_vStartPos;
     }
 
-    @Override
     public Vector2 getM_vEndPos() {
         return m_vEndPos;
     }
 
-    @Override
     public void setM_vEndPos(Vector2 m_vEndPos) {
         this.m_vEndPos = m_vEndPos;
     }
 
-    @Override
     public Vector2 getM_vCurrentPos() {
         return m_vCurrentPos;
     }
 
-    @Override
     public void setM_vCurrentPos(Vector2 m_vCurrentPos) {
         this.m_vCurrentPos = m_vCurrentPos;
     }
 
-    @Override
     public Vector2 getM_vSpeed() {
         return m_vSpeed;
     }
 
-    @Override
     public void setM_vSpeed(Vector2 m_vSpeed) {
         this.m_vSpeed = m_vSpeed;
     }
 
-    @Override
     public Vector2 getM_vForwardSpeed() {
         return m_vForwardSpeed;
     }
 
-    @Override
     public void setM_vForwardSpeed(Vector2 m_vForwardSpeed) {
         this.m_vForwardSpeed = m_vForwardSpeed;
     }
 
-    @Override
     public Vector2 getM_vReverseSpeed() {
         return m_vReverseSpeed;
     }
 
-    @Override
     public void setM_vReverseSpeed(Vector2 m_vReverseSpeed) {
         this.m_vReverseSpeed = m_vReverseSpeed;
     }
 
-    @Override
     public Vector2 getM_vForwardStartPos() {
         return m_vForwardStartPos;
     }
 
-    @Override
     public void setM_vForwardStartPos(Vector2 m_vForwardStartPos) {
         this.m_vForwardStartPos = m_vForwardStartPos;
     }
 
-    @Override
     public Vector2 getM_vReverseStartPos() {
         return m_vReverseStartPos;
     }
 
-    @Override
     public void setM_vReverseStartPos(Vector2 m_vReverseStartPos) {
         this.m_vReverseStartPos = m_vReverseStartPos;
     }
@@ -232,34 +216,27 @@ public class ZZEffectFacePositionAffector extends ZZEffectPositionAffector {
         this.m_EndFacePoint = m_EndFacePoint;
     }
 
-    @Override
     public boolean isM_bNeedReverse() {
         return m_bNeedReverse;
     }
 
-    @Override
     public void setM_bNeedReverse(boolean m_bNeedReverse) {
         this.m_bNeedReverse = m_bNeedReverse;
     }
 
-    @Override
     public boolean isM_bReverse() {
         return m_bReverse;
     }
 
-    @Override
     public void setM_bReverse(boolean m_bReverse) {
         this.m_bReverse = m_bReverse;
     }
 
-    @Override
     public float getM_effectTime() {
         return m_effectTime;
     }
 
-    @Override
     public void setM_effectTime(float m_effectTime) {
         this.m_effectTime = m_effectTime;
     }
-
 }

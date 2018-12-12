@@ -10,6 +10,7 @@ import java.util.Stack;
 /**
  * Created by hj on 16/9/21.
  */
+
 public class ZZFaceManager_v2 {
     static {
         System.loadLibrary("rotestt");
@@ -17,12 +18,18 @@ public class ZZFaceManager_v2 {
 
     private Object o1 = new Object();
     private Object o2 = new Object();
+
     public static ZZFaceManager_v2 faceManager;
+
+    public int maxStackNum = 24;
     public boolean canTrack = false;
     public long currentTimeMillis;
+
     public List<ZZFaceResult> currentFaceResults = new ArrayList<>();
-    public Stack<List<ZZFaceResult>> faceStack = new Stack<>();
+    public Stack<List<ZZFaceResult>> faceStack = new Stack<List<ZZFaceResult>>();
+
     public int randomValue = -1;
+
     public Map<String, Integer> mouthCount = new HashMap<>();
     public double start = 0;
 
@@ -43,7 +50,7 @@ public class ZZFaceManager_v2 {
         //if(!canTrack || faceResults.size() < 1){
         //    return;
         //}
-        if(!canTrack){
+        if(!canTrack || faceResults == null){
             return;
         }
         for(ZZFaceResult current : faceResults) {
@@ -54,9 +61,7 @@ public class ZZFaceManager_v2 {
                 }
             }
         }
-        if(faceResults != null){
-            currentFaceResults = faceResults;
-        }
+        currentFaceResults = faceResults;
         /*
         synchronized (o1){
             int size = faceStack.size();
@@ -86,14 +91,22 @@ public class ZZFaceManager_v2 {
         return results;*/
     }
 
-    private int getFaceStatus(ZZFaceResult faceResult) {
-        if (faceResult.getFaceStatus() != ZZFaceResult.ZZ_FACESTATUS_UNKNOWN) {
-            long ts = System.currentTimeMillis()/1000;
-            if (ts - faceResult.getTimestamp() > 1) {
-                return ZZFaceResult.ZZ_FACESTATUS_UNKNOWN;
+    public void turnFaceResultWithScaleX(List<ZZFaceResult> faceResult, String scaleX, String scaleY, String posX, String posY) {
+        if(faceResult == null || faceResult.size() < 1) {
+            return;
+        }
+        float xScale = Float.parseFloat(scaleX);
+        float yScale = Float.parseFloat(scaleY);
+        float xPos = Float.parseFloat(posX);
+        float yPos = Float.parseFloat(posY);
+        for (int i = 0; i < faceResult.size(); i++) {
+            ZZFaceResult curFace = faceResult.get(i);
+            PointF[] points = curFace.getPoints();
+            for (int j = 0; j < points.length; j++) {
+                points[j].x = points[j].x * xScale + xPos;
+                points[j].y = points[j].y * yScale + yPos;
             }
         }
-        return faceResult.getFaceStatus();
     }
 
     public int getRandom() {
@@ -115,5 +128,4 @@ public class ZZFaceManager_v2 {
     }
 
     public native double[] rotestimate2Native(double[] points, float screenRatio);
-
 }

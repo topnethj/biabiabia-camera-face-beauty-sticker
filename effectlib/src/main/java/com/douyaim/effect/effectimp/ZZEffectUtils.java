@@ -1,6 +1,6 @@
 package com.douyaim.effect.effectimp;
 
-import android.graphics.Point;
+import android.graphics.PointF;
 import com.douyaim.effect.model.Vector2;
 import java.util.HashMap;
 import java.util.Map;
@@ -48,7 +48,7 @@ public class ZZEffectUtils {
         facePointIndexs.put("faceRightBottom", 22);
     }
 
-    public static float distanceBetweenPoints(Point p1, Point p2) {
+    public static float distanceBetweenPoints(PointF p1, PointF p2) {
         float dis = (p1.x - p2.x) * (p1.x - p2.x) + (p1.y - p2.y) * (p1.y - p2.y);
         return (float)Math.sqrt(dis);
     }

@@ -55,6 +55,7 @@ public class ZZEffectControl_2d extends ZZEffectControl {
     private PointF[] _facePoints;
     private ZZEffect2DItem_v2 _item;
     private List<ZZEffectAffector> v_EffectAffectors = new ArrayList<>();
+    private float strikeTime;
 
     public void dealloc() {
         v_EffectAffectors.clear();
@@ -180,9 +181,8 @@ public class ZZEffectControl_2d extends ZZEffectControl {
                 ZZEffectFrameChangeAffector pAffector = new ZZEffectFrameChangeAffector();
                 String[] names = item.getFrameNames().split(",");
                 if (names.length == (item.getFrameTimes().length / 2.0)) {
-                    ZZEffectFrameChangeAffector.FrameInfo info = null;
                     for (int i = 0; i < names.length; i++) {
-                        info = new ZZEffectFrameChangeAffector.FrameInfo();
+                        ZZEffectFrameChangeAffector.FrameInfo info = new ZZEffectFrameChangeAffector.FrameInfo();
                         info.framename = names[i];
                         int stIndex = i * 2;
                         int etIndex = i * 2 + 1;
@@ -214,6 +214,25 @@ public class ZZEffectControl_2d extends ZZEffectControl {
                 pAffector.setM_StartBindPoint(item.getStartBindPoint());
                 pAffector.setM_EndBindPoint(item.getEndBindPoint());
                 pAffector.reset();
+                v_EffectAffectors.add(pAffector);
+            }
+            break;
+            case ZZEffectAffector.eAffectorType_StrikeChangeFrame: {
+                ZZEffectActionFrameChangeAffector pAffector = new ZZEffectActionFrameChangeAffector();
+                if (item.getAffectorFrameNames() != null) {
+                    String[] names = item.getAffectorFrameNames().split(",");
+                    String[] actions = item.getAffectorActions().split(",");
+                    String[] times = item.getAffectorTimes().split(",");
+                    assert((names.length == actions.length) && (names.length == times.length));
+                    for (int i = 0; i < names.length; i++) {
+                        ZZEffectActionFrameChangeAffector.ActionInfo actionInfo = new ZZEffectActionFrameChangeAffector.ActionInfo();
+                        actionInfo.frameName = names[i];
+                        actionInfo.action = actions[i];
+                        actionInfo.totalTime = times[i];
+                        pAffector.getM_vActionFrameInfos().add(actionInfo);
+                    }
+                    pAffector.reset();
+                }
                 v_EffectAffectors.add(pAffector);
             }
             break;
@@ -296,6 +315,10 @@ public class ZZEffectControl_2d extends ZZEffectControl {
         }
     }
 
+    public void updateStrikeTime(float curStrikeTime) {
+        this.strikeTime = curStrikeTime;
+    }
+
     public void updateFaceResult(PointF[] facePoints, float time, float pitch, float yaw, float roll, boolean animating) {
         this._facePoints = facePoints;
         getRoate(pitch, yaw, roll);
@@ -324,7 +347,7 @@ public class ZZEffectControl_2d extends ZZEffectControl {
 
         this.frameTime = time;
 
-        if (_item.getIsAction() == 0 || animating) {
+        if (_item.getIsAction() == 1 || animating) {
             for (int i = 0; i < v_EffectAffectors.size(); i++) {
                 if (v_EffectAffectors.get(i) != null) {
                     if (v_EffectAffectors.get(i).getM_type() == ZZEffectAffector.eAffectorType_PositionWithFace) {
@@ -355,7 +378,11 @@ public class ZZEffectControl_2d extends ZZEffectControl {
                         }
                         pAffector.updateProperty();
                     }
-                    updateAffector(v_EffectAffectors.get(i), time);
+                    if(_item.getIsAction() == 1 && _item.isTimeNoRepeate() && this.strikeTime > 0) {
+                        updateAffectorEx(v_EffectAffectors.get(i), time);
+                    } else {
+                        updateAffector(v_EffectAffectors.get(i), time);
+                    }
                 }
             }
         }
@@ -372,7 +399,12 @@ public class ZZEffectControl_2d extends ZZEffectControl {
             if (indexs.length > 0) {
                 facePositon = new Vector2();
                 Map<String, Integer> facePointIndexs = ZZEffectUtils.sharedFacePointIndexs();
-                int curIndex = facePointIndexs.get(indexs[0]).intValue();
+                Integer curIndexI = facePointIndexs.get(indexs[0]);
+                //TODO:资源文件配置有问题的时候,有可能找不到对应点,取nose1的值避免空指针
+                if (curIndexI == null) {
+                    curIndexI = facePointIndexs.get("nose1");
+                }
+                int curIndex = curIndexI.intValue();
                 facePositon.one = _facePoints[curIndex].x;
                 facePositon.two = _facePoints[curIndex].y;
                 for (int i = 0; i < indexs.length; i++) {
@@ -387,6 +419,21 @@ public class ZZEffectControl_2d extends ZZEffectControl {
             }
         }
         return facePositon;
+    }
+
+    private void updateAffectorEx(ZZEffectAffector affector, float time) {
+        if(affector.updateAction(time, strikeTime, _item.getStart())) {
+            switch (affector.getM_type()) {
+                case ZZEffectAffector.eAffectorType_StrikeChangeFrame: {
+                    ZZEffectActionFrameChangeAffector p = (ZZEffectActionFrameChangeAffector)affector;
+                    frameName = p.getM_CurrentActionFrame().frameName;
+                    frameTime = p.getM_effectActionTime();
+                }
+                break;
+                default:
+                    break;
+            }
+        }
     }
 
     private void updateAffector(ZZEffectAffector affector, float time) {
@@ -521,13 +568,23 @@ public class ZZEffectControl_2d extends ZZEffectControl {
         float[] curFramePos = item.getFramePos();
 
         int currentFrame;
-
         if (noRepeatFrame * speed > currentTime) {
             currentFrame = (int) Math.floor(currentTime / speed);
             currentFrame = currentFrame % frameCount;
         } else {
-            currentFrame = (int) Math.floor(currentTime / speed);
-            currentFrame = (currentFrame % (frameCount - noRepeatFrame)) + noRepeatFrame;
+            if(item.isReverse()) {
+                int curFrameCount = frameCount * 2 - noRepeatFrame - 1;
+                currentFrame = (int)Math.floor((currentTime - noRepeatFrame * speed) / speed);
+                currentFrame = currentFrame % (curFrameCount - noRepeatFrame) + noRepeatFrame;
+                int finalFrame = frameCount - 1;
+                if(currentFrame > finalFrame) {
+                    int dis = currentFrame - finalFrame;
+                    currentFrame = finalFrame - dis;
+                }
+            } else {
+                currentFrame = (int)Math.floor((currentTime - noRepeatFrame * speed) / speed);
+                currentFrame = currentFrame % (frameCount - noRepeatFrame) + noRepeatFrame;
+            }
         }
 
         result.one = curFramePos[currentFrame * 2];

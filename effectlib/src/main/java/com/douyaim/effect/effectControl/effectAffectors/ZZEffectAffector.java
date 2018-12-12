@@ -16,6 +16,7 @@ public abstract class ZZEffectAffector {
     public final static int eAffectorType_SizeScaleWithFace = 6;
     public final static int eAffectorType_SizeScaleEx = 7;
     public final static int eAffectorType_PositionQuakeX = 8;
+    public final static int eAffectorType_StrikeChangeFrame = 9;
 
     protected int m_type;
     protected float m_startTime;
@@ -23,8 +24,15 @@ public abstract class ZZEffectAffector {
     protected float m_totalTime;
     protected float m_loopTime;
 
-    public abstract boolean update(float time);
-    public abstract void reset();
+    public boolean update(float time) {
+        return false;
+    }
+
+    public void reset() {}
+
+    public boolean updateAction(float time, float actionTime, int itemStart) {
+        return false;
+    }
 
     public int getM_type() {
         return m_type;

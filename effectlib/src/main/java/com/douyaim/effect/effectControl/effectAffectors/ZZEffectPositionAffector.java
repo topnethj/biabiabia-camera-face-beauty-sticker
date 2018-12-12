@@ -1,6 +1,6 @@
 package com.douyaim.effect.effectControl.effectAffectors;
 
-import com.douyaim.effect.model.Vector2;
+import com.douyaim.effect.model.Vector3;
 
 /**
  * Created by hj on 17/3/17.
@@ -8,14 +8,14 @@ import com.douyaim.effect.model.Vector2;
 
 public class ZZEffectPositionAffector extends ZZEffectAffector {
 
-    private Vector2 m_vStartPos = new Vector2();
-    private Vector2 m_vEndPos = new Vector2();
-    private Vector2 m_vCurrentPos = new Vector2();
-    private Vector2 m_vSpeed = new Vector2();
-    private Vector2 m_vForwardSpeed = new Vector2();
-    private Vector2 m_vReverseSpeed = new Vector2();
-    private Vector2 m_vForwardStartPos = new Vector2();
-    private Vector2 m_vReverseStartPos = new Vector2();
+    private Vector3 m_vStartPos = new Vector3();
+    private Vector3 m_vEndPos = new Vector3();
+    private Vector3 m_vCurrentPos = new Vector3();
+    private Vector3 m_vSpeed = new Vector3();
+    private Vector3 m_vForwardSpeed = new Vector3();
+    private Vector3 m_vReverseSpeed = new Vector3();
+    private Vector3 m_vForwardStartPos = new Vector3();
+    private Vector3 m_vReverseStartPos = new Vector3();
     private boolean m_bNeedReverse;
     private boolean m_bReverse;
     private float m_effectTime;
@@ -29,7 +29,12 @@ public class ZZEffectPositionAffector extends ZZEffectAffector {
         if (time < m_startTime) {
             return false;
         }
-        float currentTime = time % m_totalTime;
+        float currentTime;
+        if((m_totalTime - 0.001) < 0) {
+            currentTime = time;
+        } else {
+            currentTime = time % m_totalTime;
+        }
         if (currentTime >= m_startTime && currentTime < m_endTime) {
             float frameTime = currentTime - m_startTime;
             if (m_bNeedReverse) {
@@ -55,16 +60,15 @@ public class ZZEffectPositionAffector extends ZZEffectAffector {
     @Override
     public void reset() {
         m_vCurrentPos = m_vStartPos;
-        float xDis = m_vEndPos.one - m_vStartPos.one;
-        float yDis = m_vEndPos.two - m_vStartPos.two;
+        Vector3 vdis = Vector3.subtract(m_vEndPos, m_vStartPos);
         m_effectTime = m_endTime - m_startTime;
         float updateTime = m_effectTime;
         m_bReverse = false;
         if (m_bNeedReverse) {
             updateTime = updateTime / 2.0f;
         }
-        m_vSpeed.one = xDis / updateTime;
-        m_vSpeed.two = yDis / updateTime;
+        assert(updateTime > 0.0f);
+        m_vSpeed = vdis.divide(updateTime);
         if (m_bNeedReverse) {
             m_vForwardSpeed = m_vSpeed;
             m_vReverseSpeed.one = m_vSpeed.one * -1.0f;
@@ -76,67 +80,67 @@ public class ZZEffectPositionAffector extends ZZEffectAffector {
         }
     }
 
-    public Vector2 getM_vStartPos() {
+    public Vector3 getM_vStartPos() {
         return m_vStartPos;
     }
 
-    public void setM_vStartPos(Vector2 m_vStartPos) {
+    public void setM_vStartPos(Vector3 m_vStartPos) {
         this.m_vStartPos = m_vStartPos;
     }
 
-    public Vector2 getM_vEndPos() {
+    public Vector3 getM_vEndPos() {
         return m_vEndPos;
     }
 
-    public void setM_vEndPos(Vector2 m_vEndPos) {
+    public void setM_vEndPos(Vector3 m_vEndPos) {
         this.m_vEndPos = m_vEndPos;
     }
 
-    public Vector2 getM_vCurrentPos() {
+    public Vector3 getM_vCurrentPos() {
         return m_vCurrentPos;
     }
 
-    public void setM_vCurrentPos(Vector2 m_vCurrentPos) {
+    public void setM_vCurrentPos(Vector3 m_vCurrentPos) {
         this.m_vCurrentPos = m_vCurrentPos;
     }
 
-    public Vector2 getM_vSpeed() {
+    public Vector3 getM_vSpeed() {
         return m_vSpeed;
     }
 
-    public void setM_vSpeed(Vector2 m_vSpeed) {
+    public void setM_vSpeed(Vector3 m_vSpeed) {
         this.m_vSpeed = m_vSpeed;
     }
 
-    public Vector2 getM_vForwardSpeed() {
+    public Vector3 getM_vForwardSpeed() {
         return m_vForwardSpeed;
     }
 
-    public void setM_vForwardSpeed(Vector2 m_vForwardSpeed) {
+    public void setM_vForwardSpeed(Vector3 m_vForwardSpeed) {
         this.m_vForwardSpeed = m_vForwardSpeed;
     }
 
-    public Vector2 getM_vReverseSpeed() {
+    public Vector3 getM_vReverseSpeed() {
         return m_vReverseSpeed;
     }
 
-    public void setM_vReverseSpeed(Vector2 m_vReverseSpeed) {
+    public void setM_vReverseSpeed(Vector3 m_vReverseSpeed) {
         this.m_vReverseSpeed = m_vReverseSpeed;
     }
 
-    public Vector2 getM_vForwardStartPos() {
+    public Vector3 getM_vForwardStartPos() {
         return m_vForwardStartPos;
     }
 
-    public void setM_vForwardStartPos(Vector2 m_vForwardStartPos) {
+    public void setM_vForwardStartPos(Vector3 m_vForwardStartPos) {
         this.m_vForwardStartPos = m_vForwardStartPos;
     }
 
-    public Vector2 getM_vReverseStartPos() {
+    public Vector3 getM_vReverseStartPos() {
         return m_vReverseStartPos;
     }
 
-    public void setM_vReverseStartPos(Vector2 m_vReverseStartPos) {
+    public void setM_vReverseStartPos(Vector3 m_vReverseStartPos) {
         this.m_vReverseStartPos = m_vReverseStartPos;
     }
 
@@ -163,5 +167,4 @@ public class ZZEffectPositionAffector extends ZZEffectAffector {
     public void setM_effectTime(float m_effectTime) {
         this.m_effectTime = m_effectTime;
     }
-
 }

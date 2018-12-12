@@ -3,14 +3,12 @@ package com.douyaim.effect.effectimp;
 import android.content.Context;
 import android.content.res.AssetManager;
 import android.support.annotation.NonNull;
-
 import com.douyaim.effect.utils.OpenGlUtils;
 import com.douyaim.effect.utils.ZIPExtract;
-import com.douyaim.qsapp.LibApp;
 import com.douyaim.qsapp.utils.FileUtils;
+import com.douyaim.qsapp.utils.StringUtils;
 import com.google.gson.Gson;
 import com.google.gson.annotations.SerializedName;
-
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -23,6 +21,8 @@ import java.util.List;
  * Created by hj on 16/9/21.
  */
 public class ZZEffectConfig_v2  implements Serializable {
+
+    public static final String EFFECT_SUBPATH = "effect";
 
     public String version;
     public String dirPath;
@@ -38,6 +38,11 @@ public class ZZEffectConfig_v2  implements Serializable {
 
     public ZZEffectBlendItem_v2 blendItem;
 
+    public String scaleX;               //横向缩放
+    public String scaleY;               //纵向缩放
+    public String posX;                 //横向平移
+    public String posY;                 //纵向平移
+
     public static ZZEffectConfig_v2 getEffectConfig(@NonNull String filePath){
         String configPath = filePath + "config.js";
         String json = OpenGlUtils.readStringFromSD(configPath);
@@ -46,7 +51,7 @@ public class ZZEffectConfig_v2  implements Serializable {
         }
         try{
             Gson gson = new Gson();
-            ZZEffectConfig_v2 effectConfig = (ZZEffectConfig_v2)gson.fromJson(json, ZZEffectConfig_v2.class);
+            ZZEffectConfig_v2 effectConfig = gson.fromJson(json, ZZEffectConfig_v2.class);
             effectConfig.dirPath = filePath;
 
             if(effectConfig.faceItem != null){
@@ -65,6 +70,23 @@ public class ZZEffectConfig_v2  implements Serializable {
             if(effectConfig.tieZhiItem != null){
                 effectConfig.tieZhiItem.setDirPath(filePath + "2d/");
             }
+
+            if (StringUtils.isEmpty(effectConfig.scaleX)) {
+                effectConfig.scaleX = "1";
+            }
+
+            if (StringUtils.isEmpty(effectConfig.scaleY)) {
+                effectConfig.scaleY = "1";
+            }
+
+            if (StringUtils.isEmpty(effectConfig.posX)) {
+                effectConfig.posX = "0";
+            }
+
+            if (StringUtils.isEmpty(effectConfig.posY)) {
+                effectConfig.posY = "0";
+            }
+
             return effectConfig;
         }catch (Exception e){
             e.printStackTrace();
@@ -91,7 +113,7 @@ public class ZZEffectConfig_v2  implements Serializable {
     }
 
     public static synchronized String effectConfigUnZip1(Context context, @NonNull String srcPath, @NonNull String configName) {
-        String unzipPath = ZIPExtract.getUnzipPath(srcPath);
+        String unzipPath = ZIPExtract.getUnzipPath(srcPath, EFFECT_SUBPATH);
         String zipName = ZIPExtract.obtFileName(srcPath);
         String config1 = unzipPath + File.separator + configName;
         String config2 = unzipPath + File.separator + zipName + File.separator + configName;
@@ -132,18 +154,20 @@ public class ZZEffectConfig_v2  implements Serializable {
 
     public static synchronized String effectConfigUnZip(Context context, @NonNull String url) {
         try{
-            String rootPath = ZIPExtract.downRootPath();
-            String unzipPath = ZIPExtract.getUnzipPath(url);
-            File zipFile = ZIPExtract.obtSaveFile(url);
-            if(!zipFile.exists()){
+            String unzipPath = ZIPExtract.getUnzipPath(url, EFFECT_SUBPATH);
+            File unzipFile = new File(unzipPath);
+            File zipFile = ZIPExtract.obtSaveFile(url, EFFECT_SUBPATH);
+            if(!zipFile.exists() && !unzipFile.exists()){
                 return null;
             }
-            File unzipFile = new File(unzipPath);
             if(!unzipFile.exists()){
                 unzipFile.mkdir();
+            } else if(unzipFile.length() > 0) {
+                return unzipPath + File.separator;
             }
             FileInputStream inputStream = new FileInputStream(zipFile);
             boolean r = ZIPExtract.unpackZip(inputStream, unzipFile);
+            zipFile.delete();
             if(r && unzipFile.length() > 0){
                 return unzipPath + File.separator;
             }

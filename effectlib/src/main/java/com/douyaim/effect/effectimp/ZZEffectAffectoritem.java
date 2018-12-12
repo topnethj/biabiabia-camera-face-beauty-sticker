@@ -9,6 +9,8 @@ import java.io.Serializable;
 
 public class ZZEffectAffectoritem implements Serializable {
 
+    private static final long serialVersionUID = 3494941209616705595L;
+
     @SerializedName("affector_needReverse")
     private boolean needReverse;
     private int affectorType;
@@ -60,6 +62,14 @@ public class ZZEffectAffectoritem implements Serializable {
     private float[] frameTimes;
     @SerializedName("affector_frameNames")
     private String frameNames;
+
+    //action
+    @SerializedName("affector_action")
+    private String affectorActions;
+    @SerializedName("affector_times")
+    private String affectorTimes;
+    //@SerializedName("affector_frameNames")
+    private String affectorFrameNames;
 
     public boolean isNeedReverse() {
         return needReverse;
@@ -263,6 +273,31 @@ public class ZZEffectAffectoritem implements Serializable {
 
     public String getFrameNames() {
         return frameNames;
+    }
+
+    public String getAffectorActions() {
+        return affectorActions;
+    }
+
+    public void setAffectorActions(String affectorActions) {
+        this.affectorActions = affectorActions;
+    }
+
+    public String getAffectorTimes() {
+        return affectorTimes;
+    }
+
+    public void setAffectorTimes(String affectorTimes) {
+        this.affectorTimes = affectorTimes;
+    }
+
+    public String getAffectorFrameNames() {
+        //return affectorFrameNames;
+        return frameNames;
+    }
+
+    public void setAffectorFrameNames(String affectorFrameNames) {
+        this.affectorFrameNames = affectorFrameNames;
     }
 
     public void setFrameNames(String frameNames) {

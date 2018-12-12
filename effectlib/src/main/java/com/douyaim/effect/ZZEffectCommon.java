@@ -8,13 +8,17 @@ public class ZZEffectCommon {
     public static final int  ZZMaxCountOfShaderExtraArray = 128;
     //"skinningMatrix"最大容量
     public static final int  ZZMaxCountOfSkinningMatrixArray = 60;
-    //人脸识别总点数
+    //一张脸总点数
     public static final int  ZZNumberOfFacePoints = 106;
+    //变形点数
+    public static final int  ZZNumberOfDeformPoints = 3;
     //人脸数
     public static final int  ZZNumberOfFace = 2;
-    //人脸数量+全屏
-    public static final int ZZNumberOfFaceAndScreen =  ZZNumberOfFace + 1;
-    //2张人脸特效
+    //人脸数+全屏
+    public static final int ZZNumberOfFaceAndScreen = ZZNumberOfFace + 1;
+    //变脸数
+    public static final int  ZZNumberOfFaceForChange = 1;
+    //双人特效
     public static final int ZZTwoFaceEffect = 2;
 
     public static final int ZZEffectElementNumber = 8;
@@ -41,5 +45,12 @@ public class ZZEffectCommon {
     public static final int ZZEffectElementCommonType = 0;//普通
     public static final int ZZEffectElementActionType = 1;//张嘴变胖
 
+    public static final int FaceActionType_default = 0;//默认是瘦脸
+    public static final int FaceActionType_FitFace = 1;//胖脸
+
+    public static final int ZZColorConstant = 255;
+    public static final int ZZFrameWidth = 750;
+    public static final int ZZFrameHeight = 1334;
+    public static final double PI = 3.1415926;
 }
 

@@ -43,6 +43,9 @@ public class UniformUtil2 {
     }
 
     public static void setPoints(final int location, @NonNull final PointF[] points) {
+        if (points==null) {
+            return;
+        }
         float[] vec2 = new float[points.length*2];
         for(int i = 0; i < points.length; i++){
             vec2[i*2] = points[i].x;

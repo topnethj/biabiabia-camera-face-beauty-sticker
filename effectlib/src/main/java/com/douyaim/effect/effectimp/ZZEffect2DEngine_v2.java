@@ -3,9 +3,11 @@ package com.douyaim.effect.effectimp;
 import android.graphics.PointF;
 import android.opengl.GLES20;
 import android.support.annotation.NonNull;
+
 import com.douyaim.effect.ZZEffectCommon;
 import com.douyaim.effect.face.ZZFaceResult;
 import com.douyaim.effect.model.AndroidSize;
+
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.FloatBuffer;

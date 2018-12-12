@@ -19,11 +19,9 @@ package com.douyaim.effect.Filter;
 import android.graphics.PointF;
 import android.opengl.GLES20;
 import android.opengl.Matrix;
-
 import com.douyaim.effect.utils.OpenGlUtils;
 import com.douyaim.effect.utils.Rotation;
 import com.douyaim.effect.utils.TextureRotationUtil;
-
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.FloatBuffer;
@@ -167,12 +165,12 @@ public class GPUImageFilter {
     }
     
     public int onDrawFrame(final int textureId) {
-		GLES20.glUseProgram(mGLProgId);
-		runPendingOnDrawTasks();
-		if (!mIsInitialized) {
-            return OpenGlUtils.NOT_INIT;
+        if (!mIsInitialized || mGLProgId <= 0) {
+            return textureId;
         }
 
+		GLES20.glUseProgram(mGLProgId);
+		runPendingOnDrawTasks();
 		mGLCubeBuffer.position(0);
 		GLES20.glVertexAttribPointer(mGLAttribPosition, 2, GLES20.GL_FLOAT, false, 0, mGLCubeBuffer);
 		GLES20.glEnableVertexAttribArray(mGLAttribPosition);

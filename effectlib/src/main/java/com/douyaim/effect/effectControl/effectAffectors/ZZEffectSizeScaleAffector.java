@@ -1,6 +1,7 @@
 package com.douyaim.effect.effectControl.effectAffectors;
 
 import com.douyaim.effect.model.Vector2;
+import com.douyaim.effect.model.Vector3;
 
 /**
  * Created by hj on 17/3/20.
@@ -8,14 +9,14 @@ import com.douyaim.effect.model.Vector2;
 
 public class ZZEffectSizeScaleAffector extends ZZEffectAffector {
 
-    private Vector2 m_vStartSize = new Vector2();
-    private Vector2 m_vEndSize = new Vector2();
-    private Vector2 m_vCurrentSize = new Vector2();
-    private Vector2 m_vSpeed = new Vector2();
-    private Vector2 m_vForwardSpeed = new Vector2();
-    private Vector2 m_vReverseSpeed = new Vector2();
-    private Vector2 m_vForwardStartSize = new Vector2();
-    private Vector2 m_vReverseStartSize = new Vector2();
+    private Vector3 m_vStartSize = new Vector3();
+    private Vector3 m_vEndSize = new Vector3();
+    private Vector3 m_vCurrentSize = new Vector3();
+    private Vector3 m_vSpeed = new Vector3();
+    private Vector3 m_vForwardSpeed = new Vector3();
+    private Vector3 m_vReverseSpeed = new Vector3();
+    private Vector3 m_vForwardStartSize = new Vector3();
+    private Vector3 m_vReverseStartSize = new Vector3();
     private boolean m_bNeedReverse;
     private boolean m_bReverse;
     private float m_effectTime;
@@ -64,9 +65,7 @@ public class ZZEffectSizeScaleAffector extends ZZEffectAffector {
     @Override
     public void reset() {
         m_vCurrentSize = m_vStartSize;
-        Vector2 sizeOffset = new Vector2();
-        sizeOffset.one = m_vEndSize.one - m_vStartSize.one;
-        sizeOffset.two = m_vEndSize.two - m_vStartSize.two;
+        Vector3 sizeOffset = Vector3.subtract(m_vEndSize, m_vStartSize);
         m_effectTime = m_endTime - m_startTime;
         if (m_loopTime > 0.0f) {
             m_effectTime = m_loopTime;
@@ -76,8 +75,8 @@ public class ZZEffectSizeScaleAffector extends ZZEffectAffector {
         if (m_bNeedReverse) {
             updateTime = updateTime / 2.0f;
         }
-        m_vSpeed.one = sizeOffset.one / updateTime;
-        m_vSpeed.two = sizeOffset.two / updateTime;
+        assert(updateTime > 0.0f);
+        m_vSpeed = sizeOffset.divide(updateTime);
         if (m_bNeedReverse) {
             m_vForwardSpeed = m_vSpeed;
             m_vReverseSpeed.one = m_vSpeed.one * -1.0f;
@@ -88,67 +87,67 @@ public class ZZEffectSizeScaleAffector extends ZZEffectAffector {
         }
     }
 
-    public Vector2 getM_vStartSize() {
+    public Vector3 getM_vStartSize() {
         return m_vStartSize;
     }
 
-    public void setM_vStartSize(Vector2 m_vStartSize) {
+    public void setM_vStartSize(Vector3 m_vStartSize) {
         this.m_vStartSize = m_vStartSize;
     }
 
-    public Vector2 getM_vEndSize() {
+    public Vector3 getM_vEndSize() {
         return m_vEndSize;
     }
 
-    public void setM_vEndSize(Vector2 m_vEndSize) {
+    public void setM_vEndSize(Vector3 m_vEndSize) {
         this.m_vEndSize = m_vEndSize;
     }
 
-    public Vector2 getM_vCurrentSize() {
+    public Vector3 getM_vCurrentSize() {
         return m_vCurrentSize;
     }
 
-    public void setM_vCurrentSize(Vector2 m_vCurrentSize) {
+    public void setM_vCurrentSize(Vector3 m_vCurrentSize) {
         this.m_vCurrentSize = m_vCurrentSize;
     }
 
-    public Vector2 getM_vSpeed() {
+    public Vector3 getM_vSpeed() {
         return m_vSpeed;
     }
 
-    public void setM_vSpeed(Vector2 m_vSpeed) {
+    public void setM_vSpeed(Vector3 m_vSpeed) {
         this.m_vSpeed = m_vSpeed;
     }
 
-    public Vector2 getM_vForwardSpeed() {
+    public Vector3 getM_vForwardSpeed() {
         return m_vForwardSpeed;
     }
 
-    public void setM_vForwardSpeed(Vector2 m_vForwardSpeed) {
+    public void setM_vForwardSpeed(Vector3 m_vForwardSpeed) {
         this.m_vForwardSpeed = m_vForwardSpeed;
     }
 
-    public Vector2 getM_vReverseSpeed() {
+    public Vector3 getM_vReverseSpeed() {
         return m_vReverseSpeed;
     }
 
-    public void setM_vReverseSpeed(Vector2 m_vReverseSpeed) {
+    public void setM_vReverseSpeed(Vector3 m_vReverseSpeed) {
         this.m_vReverseSpeed = m_vReverseSpeed;
     }
 
-    public Vector2 getM_vForwardStartSize() {
+    public Vector3 getM_vForwardStartSize() {
         return m_vForwardStartSize;
     }
 
-    public void setM_vForwardStartSize(Vector2 m_vForwardStartSize) {
+    public void setM_vForwardStartSize(Vector3 m_vForwardStartSize) {
         this.m_vForwardStartSize = m_vForwardStartSize;
     }
 
-    public Vector2 getM_vReverseStartSize() {
+    public Vector3 getM_vReverseStartSize() {
         return m_vReverseStartSize;
     }
 
-    public void setM_vReverseStartSize(Vector2 m_vReverseStartSize) {
+    public void setM_vReverseStartSize(Vector3 m_vReverseStartSize) {
         this.m_vReverseStartSize = m_vReverseStartSize;
     }
 
@@ -175,6 +174,5 @@ public class ZZEffectSizeScaleAffector extends ZZEffectAffector {
     public void setM_effectTime(float m_effectTime) {
         this.m_effectTime = m_effectTime;
     }
-
 }
 

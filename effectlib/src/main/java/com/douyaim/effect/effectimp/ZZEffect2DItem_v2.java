@@ -46,6 +46,7 @@ public class ZZEffect2DItem_v2 implements Serializable {
     @SerializedName("affector")
     private List<ZZEffectAffectoritem> affectorItems;
     private String alpha;
+    private boolean isTimeNoRepeate;//动作触发时是否重置时间
 
     public int getStart() {
         return start;
@@ -271,4 +272,11 @@ public class ZZEffect2DItem_v2 implements Serializable {
         this.alpha = alpha;
     }
 
+    public boolean isTimeNoRepeate() {
+        return isTimeNoRepeate;
+    }
+
+    public void setTimeNoRepeate(boolean timeNoRepeate) {
+        isTimeNoRepeate = timeNoRepeate;
+    }
 }

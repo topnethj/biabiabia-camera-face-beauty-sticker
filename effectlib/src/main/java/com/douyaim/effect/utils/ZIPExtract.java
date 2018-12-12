@@ -2,69 +2,76 @@ package com.douyaim.effect.utils;
 
 import android.support.annotation.NonNull;
 import android.text.TextUtils;
-
 import com.douyaim.qsapp.LibApp;
 import com.douyaim.qsapp.utils.FileUtils;
 import com.douyaim.qsapp.utils.MD5Utils;
-
 import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.InputStream;
+import java.util.List;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
+import java.util.zip.ZipOutputStream;
 
 /**
  * Created by Hj
  */
 public class ZIPExtract {
 
-    private static final String FNAME_EFFECT = "effect";
-    private static int BUFFER_DEFAULT_SIZE = 1024;
-    private static String EFFECT_ROOT_PATH;
+    private static int BUFFER_DEFAULT_SIZE = 1024 * 300;
+    private static String RES_ROOT_PATH;
 
-    public static boolean isAlreadyEffect(@NonNull File downFile) {
-        if (downFile.exists() && downFile.listFiles().length > 1) {
-            return true;
+    public synchronized static String downRootPath(@NonNull String subPath) {
+        if(RES_ROOT_PATH == null){
+            RES_ROOT_PATH = FileUtils.getExternalCacheDir(LibApp.getAppContext());
         }
-        return false;
-    }
-
-    public synchronized static String downRootPath() {
-        if(EFFECT_ROOT_PATH == null){
-            EFFECT_ROOT_PATH = FileUtils.getExternalCacheDir(LibApp.getAppContext()) + File.separator + FNAME_EFFECT;
-        }
-        File file = new File(EFFECT_ROOT_PATH);
+        File file = new File(RES_ROOT_PATH, subPath);
         if (!file.exists()) {
             file.mkdir();
         }
-        return EFFECT_ROOT_PATH;
+        return file.getAbsolutePath();
     }
 
-    public static String getUnzipPath(@NonNull String downUrl) {
-        String strPath = downRootPath() + File.separator + obtSaveFileName(downUrl);
-        //File file = new File(strPath);
-        //if (!file.exists()) {
-        //    file.mkdir();
-        //}
+    public static String getUnzipPath(@NonNull String downUrl, @NonNull String subPath) {
+        String strPath = downRootPath(subPath) + File.separator + obtSaveFileName(downUrl);
         return strPath;
     }
 
-    public static String obtSaveString(@NonNull String downUrl) {
-        return getUnzipPath(downUrl) + ".zip";
+    public static String getUnzipPath(@NonNull String zipFilePath) {
+        if(zipFilePath.endsWith(".zip")) {
+            return zipFilePath.substring(0, zipFilePath.lastIndexOf(".zip"));
+        }
+        return null;
     }
 
-    public static File obtSaveFile(@NonNull String downUrl) {
-        return new File(getUnzipPath(downUrl) + ".zip");
+    public static String obtSaveString(@NonNull String downUrl, @NonNull String subPath) {
+        String extension = "";
+        String fNameSuffix = downUrl.substring(downUrl.lastIndexOf("/") + 1);
+        if(fNameSuffix.lastIndexOf(".") != -1) {
+            extension = fNameSuffix.substring(fNameSuffix.lastIndexOf("."));
+        }
+        return getUnzipPath(downUrl, subPath) + extension;
+    }
+
+    public static File obtSaveFile(@NonNull String downUrl, @NonNull String subPath) {
+        String fPath = obtSaveString(downUrl, subPath);
+        return new File(fPath);
     }
     
     public static String obtFileName(String downUrl) {
         if (TextUtils.isEmpty(downUrl)) {
             return null;
         }
-        return downUrl.substring(downUrl.lastIndexOf("/") + 1, downUrl.length() - 4);
+        String fNameSuffix = downUrl.substring(downUrl.lastIndexOf("/") + 1);
+        if(fNameSuffix.lastIndexOf(".") != -1) {
+            return fNameSuffix.substring(0, fNameSuffix.lastIndexOf("."));
+        } else {
+            return fNameSuffix;
+        }
     }
 
     public static String obtSaveFileName(@NonNull String downUrl) {
@@ -75,6 +82,9 @@ public class ZIPExtract {
         FileInputStream inputStream = null;
         try {
             inputStream = new FileInputStream(file);
+            if(!dir.exists()) {
+                dir.mkdir();
+            }
             return unpackZip(inputStream, dir);
         } catch (FileNotFoundException e) {
             return false;
@@ -85,6 +95,10 @@ public class ZIPExtract {
         ZipInputStream zipInputStream = null;
         boolean ze;
         try {
+            if(!dir.exists()) {
+                dir.mkdir();
+            }
+
             zipInputStream = new ZipInputStream(new BufferedInputStream(inputStream));
             byte[] e1 = new byte[BUFFER_DEFAULT_SIZE];
 
@@ -130,4 +144,55 @@ public class ZIPExtract {
         return ze;
     }
 
+    public static void zipFiles(@NonNull List<String> resPaths, @NonNull String zipPath) throws Exception {
+        ZipOutputStream zipOut = null;
+        try{
+            zipOut = new ZipOutputStream(new BufferedOutputStream(new FileOutputStream(zipPath), BUFFER_DEFAULT_SIZE));
+            for (String resPath : resPaths) {
+                zipFile(new File(resPath), zipOut, "");
+            }
+        } catch (Exception e){
+            e.printStackTrace();
+            throw e;
+        } finally {
+            try {
+                zipOut.closeEntry();
+                zipOut.close();
+            }catch(Exception e) {
+            }
+        }
+    }
+
+    private static void zipFile(File resFile, ZipOutputStream zipOut, String rootPath) throws Exception {
+        BufferedInputStream in = null;
+        try {
+            rootPath = rootPath + (rootPath.trim().length() == 0 ? "" : File.separator)
+                    + resFile.getName();
+            rootPath = new String(rootPath.getBytes(), "utf-8");
+            if (resFile.isDirectory()) {
+                File[] fileList = resFile.listFiles();
+                for (File file : fileList) {
+                    zipFile(file, zipOut, rootPath);
+                }
+            } else {
+                byte buffer[] = new byte[BUFFER_DEFAULT_SIZE];
+                in = new BufferedInputStream(new FileInputStream(resFile), BUFFER_DEFAULT_SIZE);
+                zipOut.putNextEntry(new ZipEntry(rootPath));
+                int realLength;
+                while ((realLength = in.read(buffer)) != -1) {
+                    zipOut.write(buffer, 0, realLength);
+                }
+            }
+        } catch (Exception e) {
+            throw e;
+        } finally {
+            try {
+                if(in != null) {
+                    in.close();
+                }
+                zipOut.flush();
+            } catch (Exception e) {
+            }
+        }
+    }
 }
