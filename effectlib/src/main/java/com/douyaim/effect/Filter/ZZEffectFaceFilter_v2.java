@@ -60,8 +60,6 @@ public class ZZEffectFaceFilter_v2 extends GPUImageFilter{
     private int _frameCount;//对应序列帧的帧数
     //抠图  end
 
-    private float scaleX, scaleY, posX, posY;
-
     private int _faceStatusUniform1;
     private int _faceStatusUniform2;
     private int _faceStatusUniform3;
@@ -82,7 +80,7 @@ public class ZZEffectFaceFilter_v2 extends GPUImageFilter{
     private int _faceWidthUniform;
     private int _timesUniform,_changeFaceUniform,_framePointsUniform,_frameCountUniform,_frameRotatesUniform,
             _fillColorUniform,_pointLeftFitFaceUniform,_pointRightFitFaceUniform,_centerOvalUniform,
-            _pointBottomFitFaceUniform,_scaleXUniform,_scaleYUniform,_posXUniform,_posYUniform;
+            _pointBottomFitFaceUniform;
 
     public ZZEffectFaceFilter_v2(@NonNull ZZEffectFaceItem_v2 item) {
         super(OpenGlUtils.readShaderFromSD(LibApp.getAppContext(), item.getDirPath() + item.getVertexName()),
@@ -122,10 +120,6 @@ public class ZZEffectFaceFilter_v2 extends GPUImageFilter{
         _pointRightFitFaceUniform = GLES20.glGetUniformLocation(getProgram(), "pointRightFitFace");
         _centerOvalUniform = GLES20.glGetUniformLocation(getProgram(), "centerOval");
         _pointBottomFitFaceUniform = GLES20.glGetUniformLocation(getProgram(), "pointBottomFitFace");
-        _scaleXUniform = GLES20.glGetUniformLocation(getProgram(), "scaleX");
-        _scaleYUniform = GLES20.glGetUniformLocation(getProgram(), "scaleY");
-        _posXUniform = GLES20.glGetUniformLocation(getProgram(), "posX");
-        _posYUniform = GLES20.glGetUniformLocation(getProgram(), "posY");
 
         initCameraFrameBuffer();
 
@@ -328,9 +322,6 @@ public class ZZEffectFaceFilter_v2 extends GPUImageFilter{
                 _actions.get(j).reset();
             }
         }
-        if (_item.getPropertyItem() != null) {
-            _changeFace = _fourFaceActions.updateFaceWarpTypeByDistance(faceResult, _item.getPropertyItem().getIndexs());
-        }
     }
 
     @Override
@@ -380,11 +371,6 @@ public class ZZEffectFaceFilter_v2 extends GPUImageFilter{
         UniformUtil2.setFloat(_aspectRatioUniform, _screenRatio);
         UniformUtil2.setFloatArray(_timesUniform, _times);
         UniformUtil2.setInteger(_changeFaceUniform, _changeFace);
-
-        UniformUtil2.setFloat(_scaleXUniform, scaleX);
-        UniformUtil2.setFloat(_scaleYUniform, scaleY);
-        UniformUtil2.setFloat(_posXUniform, posX);
-        UniformUtil2.setFloat(_posYUniform, posY);
 
         switch (_item.getAction()) {
             case ZZEffectCommon.FaceActionType_FitFace://胖脸
@@ -585,13 +571,6 @@ public class ZZEffectFaceFilter_v2 extends GPUImageFilter{
         UniformUtil2.setFloat(_frameCountUniform, _frameCount);
         UniformUtil2.setFloatArray(_frameRotatesUniform, _frameRotates);
         UniformUtil2.setFloatVec4(_fillColorUniform, _fillColor);
-    }
-
-    public void updateSizeWithScaleX(String scaleX, String scaleY, String posX, String posY) {
-        this.scaleX = Float.parseFloat(scaleX);
-        this.scaleY = Float.parseFloat(scaleY);
-        this.posX = Float.parseFloat(posX);
-        this.posY = Float.parseFloat(posY);
     }
 
     @Override

@@ -1,9 +1,5 @@
 package com.douyaim.effect.effectimp;
 
-import android.graphics.PointF;
-import com.douyaim.effect.face.ZZFaceResult;
-import java.util.List;
-
 /**
  * Created by hj on 17/8/29.
  */
@@ -90,65 +86,4 @@ public class ZZEffectAction {
         }
         return time;
     }
-
-    //通过距离 更改人脸变形的类型
-    public int updateFaceWarpTypeByDistance(List<ZZFaceResult> faceResult, int[] indexs) {
-        if (_item.getPropertyItem() == null || !_item.getPropertyItem().isTwoFaceEffect() || indexs == null) {//不是双人特效，直接返回0
-            return 0;
-        }
-        if (faceResult.size() < 2) {//若当前检测到一个人脸，则不进行双人特效
-            return 0;
-        }
-        boolean isOnDis = isRaiseSecEffectWithDistanceBetter(faceResult, indexs);
-        if (!isOnDis) {
-            return 0;
-        }
-        return 1;
-    }
-
-    //判断距离是否小于指定的距离，小于指定距离触发第二张人脸特效
-    private boolean isRaiseSecEffectWithDistanceBetter(List<ZZFaceResult> faceResult, int[] indexs) {
-        if (faceResult.size() < 2) {//只有一张人脸不触发第二张人脸的特效
-            return false;
-        }
-        int centerIndex1 = 0;
-        int centerIndex2 = 32;
-        float SCALE_Z = 0.25f;
-        int mouthIndex2 = 93;
-        float point0ToPoint32First = ZZEffectUtils.distanceBetweenPoints(faceResult.get(0).getPoints()[centerIndex1], faceResult.get(0).getPoints()[centerIndex2]);
-        float point0ToPoint32Sec = ZZEffectUtils.distanceBetweenPoints(faceResult.get(1).getPoints()[centerIndex1], faceResult.get(1).getPoints()[centerIndex2]);
-        float scale = point0ToPoint32First / point0ToPoint32Sec;
-
-        if (scale < (1.0f - SCALE_Z) || scale > (1.0f + SCALE_Z)) {
-            return false;
-        }
-        //计算两张人脸之间的距离
-        float faceToFaceDistance = ZZEffectUtils.distanceBetweenPoints(faceResult.get(0).getPoints()[mouthIndex2], faceResult.get(1).getPoints()[mouthIndex2]);
-
-        //2017-02-06 start
-        if (indexs.length == 2) {
-            int firIndex = indexs[0];
-            int secIndex = indexs[1];
-            PointF p1 = new PointF();
-            PointF p2 = new PointF();
-            p1.x = (faceResult.get(0).getPoints()[firIndex].x + faceResult.get(0).getPoints()[secIndex].x) * 0.5f;
-            p1.y = (faceResult.get(0).getPoints()[firIndex].y + faceResult.get(0).getPoints()[secIndex].y) * 0.5f;
-            p2.x = (faceResult.get(1).getPoints()[firIndex].x + faceResult.get(1).getPoints()[secIndex].x) * 0.5f;
-            p2.y = (faceResult.get(1).getPoints()[firIndex].y + faceResult.get(1).getPoints()[secIndex].y) * 0.5f;
-            faceToFaceDistance = ZZEffectUtils.distanceBetweenPoints(p1, p2);
-        }
-        //2017-02-06  end
-
-        float topToBottom1 = ZZEffectUtils.distanceBetweenPoints(faceResult.get(0).getPoints()[16], faceResult.get(0).getPoints()[43]);
-        float topToBottom2 = ZZEffectUtils.distanceBetweenPoints(faceResult.get(1).getPoints()[16], faceResult.get(1).getPoints()[43]);
-
-        float dis = (topToBottom1 + topToBottom2 + point0ToPoint32First + point0ToPoint32Sec) * 0.5f;
-        float normalDis = _item.getPropertyItem().getScale() * dis;
-
-        if (faceToFaceDistance < normalDis) {
-            return true;
-        }
-        return false;
-    }
-
 }

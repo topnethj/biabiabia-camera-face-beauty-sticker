@@ -25,7 +25,6 @@ import android.support.annotation.Nullable;
 import android.support.annotation.RawRes;
 
 import com.douyaim.effect.utils.Shader;
-import com.douyaim.qsapp.utils.L;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -118,9 +117,6 @@ public class GlUtil {
         }
         int program = GLES20.glCreateProgram();
         //checkGlError("glCreateProgram");
-        if (program == 0) {
-            L.e(TAG, "Could not create program");
-        }
         GLES20.glAttachShader(program, vertexShader);
         //checkGlError("glAttachShader");
         GLES20.glAttachShader(program, pixelShader);
@@ -197,7 +193,6 @@ public class GlUtil {
         int error = GLES20.glGetError();
         if (error != GLES20.GL_NO_ERROR) {
             String msg = op + ": glError 0x" + Integer.toHexString(error);
-            L.e(TAG, msg);
             throw new RuntimeException(msg);
         }
     }

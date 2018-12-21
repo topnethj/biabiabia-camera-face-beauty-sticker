@@ -3,11 +3,9 @@ package com.douyaim.effect.effectimp;
 import android.graphics.PointF;
 import android.opengl.GLES20;
 import android.support.annotation.NonNull;
-
 import com.douyaim.effect.ZZEffectCommon;
 import com.douyaim.effect.face.ZZFaceResult;
 import com.douyaim.effect.model.AndroidSize;
-
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.FloatBuffer;
@@ -45,7 +43,6 @@ public class ZZEffect2DEngine_v2 {
     FloatBuffer textureCoordinatesBuffer;
 
     ZZFaceResult _fullStickerResult;
-    List<ZZEffect2DElement_v2> _twoFaceElements;
     List<ZZEffectElement> _elements;
 
     public ZZEffect2DEngine_v2(@NonNull AndroidSize bufferSize){
@@ -87,25 +84,17 @@ public class ZZEffect2DEngine_v2 {
         _fullStickerResult = new ZZFaceResult(true, 0, 0);
 
         _elements = new ArrayList<>();
-        _twoFaceElements = new ArrayList<>();
 
         for (ZZEffect2DItem_v2 item : items) {
-            if (item.propertyItem != null && item.propertyItem.isTwoFaceEffect()) {
-                ZZEffect2DElement_v2 element = createElementWhenTwoFace(item);
-                if(element != null){
-                    _twoFaceElements.add(element);
-                }
-            }else{
-                if(item.getRenderOrders() == null || item.getRenderOrders().length < 1){
-                    continue;
-                }else if(item.getFaceIndexs() != null && item.getFaceIndexs().length != item.getRenderOrders().length){
-                    continue;
-                }
-                if(item.getStrikeType() == ZZEffectCommon.ZZEffectElementActionType){
-                    continue;
-                }
-                loadElement(item);
+            if(item.getRenderOrders() == null || item.getRenderOrders().length < 1){
+                continue;
+            }else if(item.getFaceIndexs() != null && item.getFaceIndexs().length != item.getRenderOrders().length){
+                continue;
             }
+            if(item.getStrikeType() == ZZEffectCommon.ZZEffectElementActionType){
+                continue;
+            }
+            loadElement(item);
         }
 
         Collections.sort(_elements, new Comparator<ZZEffectElement>() {
@@ -138,44 +127,7 @@ public class ZZEffect2DEngine_v2 {
         }
     }
 
-    private ZZEffect2DElement_v2 createElementWhenTwoFace(ZZEffect2DItem_v2 item) {
-        ZZEffect2DElement_v2 result = null;
-        int currentElementType = item.propertyItem.getElementType();
-        switch (currentElementType) {
-            case ZZFaceResult.ZZEffectElementOpenMouthType://张嘴
-                result = new ZZEffetTwoFaceOpenMouth2DElement();
-                result.initWithItem(item, verticesBuffer, textureCoordinatesBuffer);
-                break;
-            case ZZFaceResult.ZZEffectElementDistanceType://距离触发
-                result = new ZZEffectTwoFaceDistance2DElement();
-                result.initWithItem(item, verticesBuffer, textureCoordinatesBuffer);
-                break;
-            case ZZFaceResult.ZZEffectElementTwoFaceRaiseType://第二张人脸出现触发
-                result = new ZZEffectTwoFace2DElement();
-                result.initWithItem(item, verticesBuffer, textureCoordinatesBuffer);
-                break;
-            case ZZFaceResult.ZZEffectElementDistanceSectionType://距离分段，例如炮仗
-                result = new ZZEffectTwoFaceDisSection2DElement();
-                result.initWithItem(item, verticesBuffer, textureCoordinatesBuffer);
-                break;
-            case ZZFaceResult.ZZEffectElementDistanceExType:
-                result = new ZZEffectTwoFaceDistance2DElementEx();
-                result.initWithItem(item, verticesBuffer, textureCoordinatesBuffer);
-                break;
-        }
-        return  result;
-    }
-
     public void updateWithFaceResult(List<ZZFaceResult> faceResult) {
-        for (ZZEffect2DElement_v2 el : _twoFaceElements) {
-            if(faceResult.size() <= 0){
-                el.updateWithNoFaceResult();
-            }else{
-                ((ZZEffectTwoFace2DElement)el).updateWithFaceResult(faceResult);
-            }
-            el._curFaceIndex = 0;
-            el.render();
-        }
         for (ZZEffectElement el : _elements) {
             //未配置对应人脸时，默认只配第一张人脸
             int[] tempFI = el.element2d._item.getFaceIndexs();
@@ -229,12 +181,6 @@ public class ZZEffect2DEngine_v2 {
                 e.element2d.reset();
             }
             _elements.clear();
-        }
-        if(_twoFaceElements != null && _twoFaceElements.size() > 0) {
-            for (ZZEffect2DElement_v2 el : _twoFaceElements) {
-                el.reset();
-            }
-            _twoFaceElements.clear();
         }
         verticesBuffer = null;
         textureCoordinatesBuffer = null;

@@ -6,9 +6,6 @@ import java.util.Random;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-/**
- * Created by garfield on 4/14/16.
- */
 public class StringUtils {
     /**
      * @see <a href="http://stackoverflow.com/questions/24070515/rendering-or-deleting-emoji/24071599#24071599

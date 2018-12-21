@@ -7,6 +7,7 @@ import android.graphics.Paint;
 import android.graphics.PixelFormat;
 import android.graphics.Point;
 import android.graphics.PointF;
+import android.graphics.PorterDuff;
 import android.hardware.Camera;
 import android.os.Bundle;
 import android.os.Handler;
@@ -27,7 +28,7 @@ import com.douyaim.qsapp.camera.camerautil.CameraController;
 import com.douyaim.qsapp.camera.widget.CameraSurfaceView;
 import com.hulu.sdk.Faces;
 import com.hulu.sdk.HuluUtils;
-import com.multitrack106.Accelerometer;
+import com.douyaim.effect.Accelerometer;
 import java.lang.ref.SoftReference;
 import java.util.ArrayList;
 import java.util.List;
@@ -73,6 +74,7 @@ public class MainActivity extends AppCompatActivity {
     private boolean isFirst = true;
 
     //人脸识别
+    private boolean isFaceDebug = false;//绘制人脸点
     private static final int MESSAGE_DRAW_POINTS = 999;
     private boolean isTrackerPaused = false;
     private HandlerThread trackerHandlerThread;
@@ -109,7 +111,6 @@ public class MainActivity extends AppCompatActivity {
         mOverlap.getHolder().setFormat(PixelFormat.TRANSLUCENT);
         mPaint = new Paint();
         mPaint.setColor(Color.rgb(57, 138, 243));
-        //int strokeWidth = Math.max(PREVIEW_HEIGHT / 240, 2);
         mPaint.setStrokeWidth(2);
         mPaint.setStyle(Paint.Style.FILL);
     }
@@ -270,15 +271,14 @@ public class MainActivity extends AppCompatActivity {
             }
 
             float[] faces = Faces.getInstance(LibApp.getAppContext()).detect(tmp, mCameraSurfaceView.getFrameWidth(), mCameraSurfaceView.getFrameHeight(), dir);
-            float[] bound = null;
+            float[] bound = Faces.getInstance(LibApp.getAppContext()).getRect();
             prepareCanvas(faces, bound, frontCamera);
         }
     }
 
     private void prepareCanvas(float[] faces, float[] boundRect, boolean frontCamera) {
-        Canvas canvas = null;
         List<ZZFaceResult> faceResults = new ArrayList<>();
-        if(faces.length >= 212){
+        if(faces.length >= 212) {
             PointF[] points = HuluUtils.getPoints(faces, mCameraSurfaceView.getFrameWidth(), mCameraSurfaceView.getFrameHeight(), frontCamera);
 
             ZZFaceResult faceResult = new ZZFaceResult(frontCamera, mCameraSurfaceView.getFrameWidth(), mCameraSurfaceView.getFrameHeight());
@@ -287,6 +287,19 @@ public class MainActivity extends AppCompatActivity {
         }
 
         ZZFaceManager_v2.getZZFaceManager().updateZZFaceResults(faceResults);
+
+        if(isFaceDebug && faces.length >= 212) {
+            if (!mOverlap.getHolder().getSurface().isValid()) {
+                return;
+            }
+            Canvas canvas = mOverlap.getHolder().lockCanvas();
+            if (canvas != null) {
+                canvas.drawColor(0, PorterDuff.Mode.CLEAR);
+                canvas.setMatrix(matrix);
+                HuluUtils.drawPoints(canvas, mPaint, faces, mCameraSurfaceView.getFrameWidth(), mCameraSurfaceView.getFrameHeight(), frontCamera);
+                mOverlap.getHolder().unlockCanvasAndPost(canvas);
+            }
+        }
     }
 
     private void switchCameraFacing() {

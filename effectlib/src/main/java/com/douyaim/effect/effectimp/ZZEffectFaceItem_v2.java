@@ -17,7 +17,6 @@ public class ZZEffectFaceItem_v2 implements Serializable {
     @SerializedName("fragment")
     private String fragmentName;
     private int count;
-    private ZZPropertyItem propertyItem;
     @SerializedName("extra")
     private float[] extras;
     private String dirPath;
@@ -96,14 +95,6 @@ public class ZZEffectFaceItem_v2 implements Serializable {
 
     public void setDuration(float duration) {
         this.duration = duration;
-    }
-
-    public ZZPropertyItem getPropertyItem() {
-        return propertyItem;
-    }
-
-    public void setPropertyItem(ZZPropertyItem propertyItem) {
-        this.propertyItem = propertyItem;
     }
 
     public float[] getFramePoints() {

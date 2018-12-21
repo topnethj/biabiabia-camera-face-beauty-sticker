@@ -47,7 +47,6 @@ public class ZZEffect2DElement_v2 {
     double[] _startTimes;
     int[] _animatings;
     int _curFaceIndex;
-    Map<Integer, Float> _strikeTime = new HashMap<>();
 
     ZZEffectControl_2d _control_2d;
 
@@ -100,8 +99,6 @@ public class ZZEffect2DElement_v2 {
 
         _faceStatusFourFace = new HashMap<>();
 
-        initStrikeTimeWithFace();
-
         ZZEffectTexCoorItem texCoorItem = ZZEffectTextureManager.getZZEffectTextureManager().getTexCoorByName(_control_2d.getFrameName());
         if(texCoorItem != null){
             texture = ZZEffectTextureManager.getZZEffectTextureManager().getTextureByPath(_item.getDirPath() + texCoorItem.getImageName());
@@ -139,8 +136,6 @@ public class ZZEffect2DElement_v2 {
         //_faceStatus = newStatus;
 
         _faceStatusFourFace.put(""+_curFaceIndex, newStatus);
-
-        _control_2d.updateStrikeTime(_strikeTime.get(_curFaceIndex));
 
         _control_2d.updateFaceResult(_facePoints, _times[_curFaceIndex], _pitch, _yaw, _roll, _animatings[_curFaceIndex] == 0 ? false : true);
     }
@@ -189,7 +184,6 @@ public class ZZEffect2DElement_v2 {
                     }
                     time = (float)(now - _startTimes[_curFaceIndex]) / 1000f;
                     _animatings[_curFaceIndex] = 1;
-                    noteStrikeTime(time, _curFaceIndex);
                 }
             }
         } else {
@@ -237,10 +231,6 @@ public class ZZEffect2DElement_v2 {
             _curFaceIndex = -1;
         }
 
-        initStrikeTimeWithFace();
-        //_control_2d.updateStrikeTime(_strikeTime.get(_curFaceIndex));
-        _control_2d.updateStrikeTime(0);//TODO:
-
         //_control_2d.updateFaceResult(null, _times[_curFaceIndex], 0.0f, 0.0f, 0.0f, false);
         _control_2d.updateFaceResult(null, 0.0f, 0.0f, 0.0f, 0.0f, false);//TODO:
     }
@@ -260,14 +250,8 @@ public class ZZEffect2DElement_v2 {
             return;
         }
 
-        if (_item.propertyItem != null && _item.propertyItem.isTwoFaceEffect()) {
-            if (!_animating && _item.getIsAction() == 0) {
-                return;
-            }
-        } else {
-            if (_animatings[_curFaceIndex] == 0 && _item.getIsAction() == 0) {
-                return;
-            }
+        if (_animatings[_curFaceIndex] == 0 && _item.getIsAction() == 0) {
+            return;
         }
 
         GLES20.glUseProgram(_program);
@@ -280,25 +264,16 @@ public class ZZEffect2DElement_v2 {
         UniformUtil2.setUniformMatrix4fBuffer(GLES20.glGetUniformLocation(_program, "tranMat"), tranMat.getFloatValues());
 
         if (_item.getIsAction() > 0) {
-            if (_item.propertyItem != null && _item.propertyItem.isTwoFaceEffect()) {
-                UniformUtil2.setInteger(_actionUniform, _animating ? 1 : 0);
-            }else{
-                UniformUtil2.setInteger(_actionUniform, _animatings[_curFaceIndex]);
-            }
+            UniformUtil2.setInteger(_actionUniform, _animatings[_curFaceIndex]);
         }
 
         //_alpha
         UniformUtil2.setFloat(_alphaUniform, _control_2d.getAlpha());
 
-        if (_item.propertyItem != null && _item.propertyItem.isTwoFaceEffect()) {
-            UniformUtil2.setFloat(_timeUniform, _time);
-            UniformUtil2.setInteger(_faceStatusUniform, _faceStatus);
-        }else {
-            UniformUtil2.setFloat(_timeUniform, _times[_curFaceIndex]);
-            int fs = _faceStatusFourFace.get(""+_curFaceIndex) != null ?
-                    _faceStatusFourFace.get(""+_curFaceIndex) : ZZFaceResult.ZZ_FACESTATUS_UNKNOWN;
-            UniformUtil2.setInteger(_faceStatusUniform, fs);
-        }
+        UniformUtil2.setFloat(_timeUniform, _times[_curFaceIndex]);
+        int fs = _faceStatusFourFace.get(""+_curFaceIndex) != null ?
+                _faceStatusFourFace.get(""+_curFaceIndex) : ZZFaceResult.ZZ_FACESTATUS_UNKNOWN;
+        UniformUtil2.setInteger(_faceStatusUniform, fs);
 
         if(_facePoints != null){
             UniformUtil2.setPoints(_facePointsUniform, _facePoints);
@@ -364,17 +339,6 @@ public class ZZEffect2DElement_v2 {
         _alphaUniform = GLES20.glGetUniformLocation(_program, "alphaFactor");
     }
 
-    private void initStrikeTimeWithFace() {
-        _strikeTime.clear();
-        for (int i = 0; i < ZZEffectCommon.ZZNumberOfFaceAndScreen; i++) {
-            noteStrikeTime(0, i);
-        }
-    }
-
-    private void noteStrikeTime(float time, int faceindex) {
-        _strikeTime.put(faceindex, time);
-    }
-
     void reset() {
         _animating = false;
         _faceStatus = ZZFaceResult.ZZ_FACESTATUS_UNKNOWN;
@@ -393,7 +357,6 @@ public class ZZEffect2DElement_v2 {
         if (_faceStatusFourFace != null) {
             _faceStatusFourFace.clear();
         }
-        initStrikeTimeWithFace();
     }
 
     @Override
@@ -401,5 +364,4 @@ public class ZZEffect2DElement_v2 {
         super.finalize();
         reset();
     }
-
 }

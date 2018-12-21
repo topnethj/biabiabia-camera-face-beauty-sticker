@@ -3,7 +3,7 @@ package com.douyaim.qsapp.camera.camerautil;
 import android.graphics.Rect;
 import android.hardware.Camera;
 import android.view.View;
-import com.douyaim.qsapp.utils.L;
+
 import java.util.Collections;
 import java.util.List;
 
@@ -42,10 +42,8 @@ public class CameraHelper {
         } else {
             targetHeight = 720;
         }
-        L.i(TAG, "targetHieght = " + targetHeight);
         // Try to find an size match aspect ratio and size
         for (Camera.Size size : sizes) {
-            L.d("CameraHelper", size.width + " " + size.height);
             double ratio = (double) size.width / size.height;
             if (Math.abs(ratio - targetRatio) > ASPECT_TOLERANCE) continue;
 

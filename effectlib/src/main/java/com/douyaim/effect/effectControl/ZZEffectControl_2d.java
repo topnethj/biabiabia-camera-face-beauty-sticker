@@ -11,7 +11,6 @@ import com.douyaim.effect.effectControl.effectAffectors.ZZEffectFrameChangeAffec
 import com.douyaim.effect.effectControl.effectAffectors.ZZEffectPositionAffector;
 import com.douyaim.effect.effectControl.effectAffectors.ZZEffectRotateAffector;
 import com.douyaim.effect.effectControl.effectAffectors.ZZEffectSizeScaleAffector;
-import com.douyaim.effect.effectControl.effectAffectors.ZZEffectSizeScaleAffectorEx;
 import com.douyaim.effect.effectimp.ZZEffect2DItem_v2;
 import com.douyaim.effect.effectimp.ZZEffectAffectoritem;
 import com.douyaim.effect.effectimp.ZZEffectTexCoorItem;
@@ -41,31 +40,17 @@ public class ZZEffectControl_2d extends ZZEffectControl {
 
     private Vector2 size = new Vector2();
     private Vector2 position = new Vector2();
-    private Vector2 bindFacePosition = new Vector2();
-    private float rollOffset;
     private float pitch;
     private float yaw;
     private float roll;
     private float alpha;
     private float screenRatio;
-    private boolean isWithFace;
     private String frameName;
     private float frameTime;
 
     private PointF[] _facePoints;
     private ZZEffect2DItem_v2 _item;
     private List<ZZEffectAffector> v_EffectAffectors = new ArrayList<>();
-    private float strikeTime;
-
-    public void dealloc() {
-        v_EffectAffectors.clear();
-    }
-
-    public void reset() {
-    }
-
-    public void stop() {
-    }
 
     public void initWithItem(ZZEffect2DItem_v2 item) {
         _item = item;
@@ -117,20 +102,6 @@ public class ZZEffectControl_2d extends ZZEffectControl {
                 pAffector.getM_vEndSize().one = item.getEndWidth();
                 pAffector.getM_vEndSize().two = item.getEndHeight();
                 pAffector.setM_bNeedReverse(item.isNeedReverse());
-                pAffector.reset();
-                v_EffectAffectors.add(pAffector);
-            }
-            break;
-            case ZZEffectAffector.eAffectorType_SizeScaleEx: {
-                ZZEffectSizeScaleAffectorEx pAffector = new ZZEffectSizeScaleAffectorEx();
-                pAffector.setM_totalTime(item.getTotalTime());
-                pAffector.setM_startTime(item.getStartTime());
-                pAffector.setM_endTime(item.getEndTime());
-                pAffector.setM_loopTime(item.getLoopTime());
-                pAffector.getM_vStartSize().one = item.getStartWidth();
-                pAffector.getM_vStartSize().two = item.getStartHeight();
-                pAffector.getM_vEndSize().one = item.getEndWidth();
-                pAffector.getM_vEndSize().two = item.getEndHeight();
                 pAffector.reset();
                 v_EffectAffectors.add(pAffector);
             }
@@ -217,25 +188,6 @@ public class ZZEffectControl_2d extends ZZEffectControl {
                 v_EffectAffectors.add(pAffector);
             }
             break;
-            case ZZEffectAffector.eAffectorType_StrikeChangeFrame: {
-                ZZEffectActionFrameChangeAffector pAffector = new ZZEffectActionFrameChangeAffector();
-                if (item.getAffectorFrameNames() != null) {
-                    String[] names = item.getAffectorFrameNames().split(",");
-                    String[] actions = item.getAffectorActions().split(",");
-                    String[] times = item.getAffectorTimes().split(",");
-                    assert((names.length == actions.length) && (names.length == times.length));
-                    for (int i = 0; i < names.length; i++) {
-                        ZZEffectActionFrameChangeAffector.ActionInfo actionInfo = new ZZEffectActionFrameChangeAffector.ActionInfo();
-                        actionInfo.frameName = names[i];
-                        actionInfo.action = actions[i];
-                        actionInfo.totalTime = times[i];
-                        pAffector.getM_vActionFrameInfos().add(actionInfo);
-                    }
-                    pAffector.reset();
-                }
-                v_EffectAffectors.add(pAffector);
-            }
-            break;
             default:
                 break;
         }
@@ -315,10 +267,6 @@ public class ZZEffectControl_2d extends ZZEffectControl {
         }
     }
 
-    public void updateStrikeTime(float curStrikeTime) {
-        this.strikeTime = curStrikeTime;
-    }
-
     public void updateFaceResult(PointF[] facePoints, float time, float pitch, float yaw, float roll, boolean animating) {
         this._facePoints = facePoints;
         getRoate(pitch, yaw, roll);
@@ -378,11 +326,8 @@ public class ZZEffectControl_2d extends ZZEffectControl {
                         }
                         pAffector.updateProperty();
                     }
-                    if(_item.getIsAction() == 1 && _item.isTimeNoRepeate() && this.strikeTime > 0) {
-                        updateAffectorEx(v_EffectAffectors.get(i), time);
-                    } else {
-                        updateAffector(v_EffectAffectors.get(i), time);
-                    }
+
+                    updateAffector(v_EffectAffectors.get(i), time);
                 }
             }
         }
@@ -421,21 +366,6 @@ public class ZZEffectControl_2d extends ZZEffectControl {
         return facePositon;
     }
 
-    private void updateAffectorEx(ZZEffectAffector affector, float time) {
-        if(affector.updateAction(time, strikeTime, _item.getStart())) {
-            switch (affector.getM_type()) {
-                case ZZEffectAffector.eAffectorType_StrikeChangeFrame: {
-                    ZZEffectActionFrameChangeAffector p = (ZZEffectActionFrameChangeAffector)affector;
-                    frameName = p.getM_CurrentActionFrame().frameName;
-                    frameTime = p.getM_effectActionTime();
-                }
-                break;
-                default:
-                    break;
-            }
-        }
-    }
-
     private void updateAffector(ZZEffectAffector affector, float time) {
         if (affector.update(time)) {
             switch (affector.getM_type()) {
@@ -449,13 +379,6 @@ public class ZZEffectControl_2d extends ZZEffectControl {
                     ZZEffectSizeScaleAffector p = (ZZEffectSizeScaleAffector) affector;
                     this.size.one = p.getM_vCurrentSize().one;
                     this.size.two = p.getM_vCurrentSize().two;
-                }
-                break;
-                case ZZEffectAffector.eAffectorType_SizeScaleEx: {
-                    ZZEffectSizeScaleAffectorEx p = (ZZEffectSizeScaleAffectorEx) affector;
-                    this.size.one = p.getM_vCurrentSize().one;
-                    this.size.two = p.getM_vCurrentSize().two;
-
                 }
                 break;
                 case ZZEffectAffector.eAffectorType_SizeScaleWithFace: {

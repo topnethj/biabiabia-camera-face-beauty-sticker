@@ -23,8 +23,6 @@ public class ZZEffect2DItem_v2 implements Serializable {
     private float[] extras;
     @SerializedName("faceIndex")
     private int faceIndex;
-    @SerializedName("twoFaceProperty")
-    ZZPropertyItem propertyItem;
     @SerializedName("note")
     private String note;
     private String dirPath;
@@ -134,14 +132,6 @@ public class ZZEffect2DItem_v2 implements Serializable {
 
     public void setIsAction(int isAction) {
         this.isAction = isAction;
-    }
-
-    public ZZPropertyItem getPropertyItem() {
-        return propertyItem;
-    }
-
-    public void setPropertyItem(ZZPropertyItem propertyItem) {
-        this.propertyItem = propertyItem;
     }
 
     public int getRandomType() {

@@ -1,4 +1,4 @@
-package com.multitrack106;
+package com.douyaim.effect;
 
 import android.content.Context;
 import android.hardware.Sensor;

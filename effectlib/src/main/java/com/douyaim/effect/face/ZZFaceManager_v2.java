@@ -91,24 +91,6 @@ public class ZZFaceManager_v2 {
         return results;*/
     }
 
-    public void turnFaceResultWithScaleX(List<ZZFaceResult> faceResult, String scaleX, String scaleY, String posX, String posY) {
-        if(faceResult == null || faceResult.size() < 1) {
-            return;
-        }
-        float xScale = Float.parseFloat(scaleX);
-        float yScale = Float.parseFloat(scaleY);
-        float xPos = Float.parseFloat(posX);
-        float yPos = Float.parseFloat(posY);
-        for (int i = 0; i < faceResult.size(); i++) {
-            ZZFaceResult curFace = faceResult.get(i);
-            PointF[] points = curFace.getPoints();
-            for (int j = 0; j < points.length; j++) {
-                points[j].x = points[j].x * xScale + xPos;
-                points[j].y = points[j].y * yScale + yPos;
-            }
-        }
-    }
-
     public int getRandom() {
         return randomValue;
     }

@@ -8,7 +8,6 @@ import android.opengl.GLES11Ext;
 import android.opengl.GLES20;
 import android.opengl.GLUtils;
 import com.douyaim.qsapp.LibApp;
-import com.douyaim.qsapp.utils.L;
 import com.douyaim.qsapp.utils.StringUtils;
 import java.io.BufferedReader;
 import java.io.FileInputStream;
@@ -179,12 +178,10 @@ public class OpenGlUtils {
         int[] link = new int[1];
         iVShader = loadShader(strVSource, GLES20.GL_VERTEX_SHADER);
         if (iVShader == 0) {
-            L.d("Load Program", "Vertex Shader Failed");
             return 0;
         }
         iFShader = loadShader(strFSource, GLES20.GL_FRAGMENT_SHADER);
         if (iFShader == 0) {
-            L.d("Load Program", "Fragment Shader Failed");
             return 0;
         }
 
@@ -194,7 +191,6 @@ public class OpenGlUtils {
         GLES20.glLinkProgram(iProgId);
         GLES20.glGetProgramiv(iProgId, GLES20.GL_LINK_STATUS, link, 0);
         if (link[0] <= 0) {
-            L.d("Load Program", "Linking Failed");
 		    GLES20.glDeleteProgram(iProgId);
             return 0;
         }
@@ -210,7 +206,6 @@ public class OpenGlUtils {
         GLES20.glCompileShader(iShader);
         GLES20.glGetShaderiv(iShader, GLES20.GL_COMPILE_STATUS, compiled, 0);
         if (compiled[0] == 0) {
-            L.e("Load Shader Failed", "Compilation\n" + GLES20.glGetShaderInfoLog(iShader));
             return 0;
         }
         return iShader;
@@ -404,7 +399,6 @@ public class OpenGlUtils {
 		int error = GLES20.glGetError();
 		if (error != GLES20.GL_NO_ERROR) {
 			String msg = op + ": glError 0x" + Integer.toHexString(error);
-			L.e("OpenGlUtils", msg);
 			throw new RuntimeException(msg);
 		}
 	}

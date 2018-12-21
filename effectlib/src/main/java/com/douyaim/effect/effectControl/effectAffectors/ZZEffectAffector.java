@@ -14,9 +14,6 @@ public abstract class ZZEffectAffector {
     public final static int eAffectorType_Frame = 4;
     public final static int eAffectorType_PositionWithFace = 5;
     public final static int eAffectorType_SizeScaleWithFace = 6;
-    public final static int eAffectorType_SizeScaleEx = 7;
-    public final static int eAffectorType_PositionQuakeX = 8;
-    public final static int eAffectorType_StrikeChangeFrame = 9;
 
     protected int m_type;
     protected float m_startTime;

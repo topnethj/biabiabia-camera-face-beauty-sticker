@@ -8,7 +8,6 @@ import com.douyaim.effect.effectimp.ZZEffectConfig_v2;
 import com.douyaim.effect.effectimp.ZZEffectTexCoorConfig;
 import com.douyaim.effect.effectimp.ZZEffectTexCoorItem;
 import com.douyaim.effect.effectimp.ZZEffectTextureManager;
-import com.douyaim.effect.face.ZZFaceManager_v2;
 import com.douyaim.effect.face.ZZFaceResult;
 import com.douyaim.effect.model.AndroidSize;
 import com.douyaim.effect.utils.OpenGlUtils;
@@ -133,8 +132,6 @@ public class ZZEffectFilter_v2 extends GPUImageFilter {
         }
 
         if(_faceFilter != null){
-            //face缩放和平移的因子
-            _faceFilter.updateSizeWithScaleX(effectConfig_v2.scaleX, effectConfig_v2.scaleY, effectConfig_v2.posX, effectConfig_v2.posY);
             _faceFilter.updateWithFaceResults(faceResult);
             t1 = _faceFilter.onDrawFrame(my_ttid);
         }
@@ -143,9 +140,6 @@ public class ZZEffectFilter_v2 extends GPUImageFilter {
             _tieZhiFilter.update(faceResult);
             t1 = _tieZhiFilter.onDrawFrame(my_ttid);
         }
-
-        ZZFaceManager_v2.getZZFaceManager().turnFaceResultWithScaleX(faceResult, effectConfig_v2.scaleX,
-                effectConfig_v2.scaleY, effectConfig_v2.posX, effectConfig_v2.posY);
 
         if(_engine2d != null){
             _engine2d.renderStart();

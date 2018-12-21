@@ -13,9 +13,6 @@ import android.os.Message;
 import android.text.TextUtils;
 import android.view.MotionEvent;
 import android.view.View;
-
-import com.douyaim.qsapp.utils.L;
-
 import java.lang.ref.SoftReference;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -111,8 +108,6 @@ public class CameraController implements Camera.AutoFocusCallback,
                     mCamera = Camera.open(mCameraId);
                 }
 
-                L.e("打开相机");
-
                 //对lg nexus 5x的适配
 //                Build build = new Build();
                 String model = Build.MODEL;
@@ -134,7 +129,6 @@ public class CameraController implements Camera.AutoFocusCallback,
             } catch (Exception e) {
                 e.printStackTrace();
                 release();
-                L.i(TAG, "NOT OPEN");
             }
 
             if (mCamera == null) {
@@ -210,7 +204,6 @@ public class CameraController implements Camera.AutoFocusCallback,
                 // 预览尺寸
                 if (previewSize != null) {
                     cp.setPreviewSize(previewSize.width, previewSize.height);
-                    L.d("CameraController", previewSize.width + " " + previewSize.height);
                 }
                 cp.setPreviewFormat(DEFAULT_PIXEL_FORMAT);
 
@@ -237,7 +230,6 @@ public class CameraController implements Camera.AutoFocusCallback,
                 try {
                     Camera.Parameters mParams = mCamera.getParameters();
                     if (!mParams.isZoomSupported()) {
-                        L.e(TAG, "nonsupport set Zoom");
                         return;
                     }
                     int maxZoom = mParams.getMaxZoom();
@@ -245,19 +237,15 @@ public class CameraController implements Camera.AutoFocusCallback,
 
                     int current = mParams.getZoom();
                     if (current == targetZoom) {
-                        L.i(TAG, "Repeat set Zoom , currentZoom=" + targetZoom);
                         return;
                     }
                     if (mParams.isSmoothZoomSupported()) {
-                        L.i(TAG, "support SmoothZoom go to start");
                         mCamera.startSmoothZoom(targetZoom);
                     } else {
-                        L.i(TAG, "set zoom-->" + targetZoom);
                         mParams.setZoom(targetZoom);
                         mCamera.setParameters(mParams);
                     }
                 } catch (Exception e) {
-                    L.e(TAG, "setZoom ERROR-->" + e.toString());
                 }
             }
         }
@@ -324,10 +312,8 @@ public class CameraController implements Camera.AutoFocusCallback,
                             mCamera.cancelAutoFocus();
                         }
                         mCamera.startPreview();
-                        L.i(TAG, "打开预览了");
                     } catch (Exception e) {
                         e.printStackTrace();
-                        L.i(TAG, "相机未被打开");
 
                     }
                 }
@@ -341,7 +327,6 @@ public class CameraController implements Camera.AutoFocusCallback,
      * @return
      */
     public boolean stopCameraPreview() {
-        L.d(TAG, "关闭预览了");
         if (mCamera != null) {
             synchronized (mLock) {
                 if (mCamera != null) {
@@ -363,7 +348,6 @@ public class CameraController implements Camera.AutoFocusCallback,
      * 释放相机资源
      */
     public void release() {
-        L.w(TAG, "release camera");
         if (mCamera != null) {
             synchronized (mLock) {
                 if (mCamera != null) {
@@ -407,7 +391,6 @@ public class CameraController implements Camera.AutoFocusCallback,
                 mCamera.setParameters(p);
             }
         } catch (Exception e) {
-            L.e(TAG, "openLight failure!!!");
             e.printStackTrace();
         }
     }
@@ -426,7 +409,6 @@ public class CameraController implements Camera.AutoFocusCallback,
                 mCamera.setParameters(p);
             }
         } catch (Exception e) {
-            L.e(TAG, "openLight failure!!!");
             e.printStackTrace();
         }
     }

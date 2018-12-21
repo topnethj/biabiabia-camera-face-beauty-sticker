@@ -17,7 +17,6 @@ public class MD5Utils {
         try {
             messagedigest = MessageDigest.getInstance("MD5");
         } catch (NoSuchAlgorithmException e) {
-            L.e(e.toString());
         }
     }
 
