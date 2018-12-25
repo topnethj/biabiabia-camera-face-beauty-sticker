@@ -8,7 +8,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-        <com.douyaim.qsapp.camera.widget.CameraSurfaceView
+        <com.biabiabia.app.camera.widget.CameraSurfaceView
             android:id="@+id/camera"
             android:layout_width="match_parent"
             android:layout_height="match_parent" />
