@@ -3,7 +3,7 @@ package com.douyaim.effect.effectimp;
 import android.media.AudioManager;
 import android.media.SoundPool;
 import android.support.annotation.NonNull;
-import com.douyaim.qsapp.utils.StringUtils;
+import android.text.TextUtils;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Vector;
@@ -24,7 +24,7 @@ public class ZZEffectAudioEngine_v2 {
             soundPool = new SoundPool(items.size(), AudioManager.STREAM_MUSIC, 0);
         }
         for (ZZEffectAudioItem_v2 item : items) {
-            if(StringUtils.isEmpty(item.getFilename())){
+            if(TextUtils.isEmpty(item.getFilename())){
                 continue;
             }
             String path = item.getDirPath() + item.getFilename();

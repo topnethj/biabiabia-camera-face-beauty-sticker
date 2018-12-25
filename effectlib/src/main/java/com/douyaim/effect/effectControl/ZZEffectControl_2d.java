@@ -22,7 +22,7 @@ import com.douyaim.effect.model.Matrix4;
 import com.douyaim.effect.model.Vector2;
 import com.douyaim.effect.model.Vector4;
 import com.douyaim.effect.utils.ScreenUtils;
-import com.douyaim.qsapp.LibApp;
+import com.douyaim.effect.LibApp;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;

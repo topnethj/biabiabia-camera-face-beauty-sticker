@@ -22,7 +22,6 @@ public class ZZEffect2DEngine_v2 {
     public int[] mFrameBufferTextures = null;
 
     static PointF[] defaultPoints;
-    static PointF[] defaultPointsForTwo;
 
     static final float vertices[] = {
             -1.0f, -1.0f,
@@ -56,16 +55,6 @@ public class ZZEffect2DEngine_v2 {
                     defaultPoints[i].x = 0.0f;
                     defaultPoints[i].y = 0.0f;
                 }
-            }
-            if(defaultPointsForTwo == null){
-                defaultPointsForTwo = new PointF[ZZEffectCommon.ZZNumberOfFacePoints * ZZEffectCommon.ZZTwoFaceEffect];
-            }
-            for(int i = 0; i < defaultPointsForTwo.length; i++){
-                if(defaultPointsForTwo[i] == null){
-                    defaultPointsForTwo[i] = new PointF();
-                }
-                defaultPointsForTwo[i].x = -2.0f;
-                defaultPointsForTwo[i].y = -2.0f;
             }
         }
     }

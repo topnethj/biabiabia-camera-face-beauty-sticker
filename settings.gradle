@@ -1,1 +1,1 @@
-include ':app', ':effectlib', ':baselib'
+include ':app', ':effectlib'

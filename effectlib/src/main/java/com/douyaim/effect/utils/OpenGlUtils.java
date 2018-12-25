@@ -7,8 +7,8 @@ import android.graphics.BitmapFactory;
 import android.opengl.GLES11Ext;
 import android.opengl.GLES20;
 import android.opengl.GLUtils;
-import com.douyaim.qsapp.LibApp;
-import com.douyaim.qsapp.utils.StringUtils;
+import android.text.TextUtils;
+import com.douyaim.effect.LibApp;
 import java.io.BufferedReader;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -172,7 +172,7 @@ public class OpenGlUtils {
         int iVShader;
         int iFShader;
         int iProgId;
-		if(StringUtils.isEmpty(strVSource) || StringUtils.isEmpty(strFSource)) {
+		if(TextUtils.isEmpty(strVSource) || TextUtils.isEmpty(strFSource)) {
 			return 0;
 		}
         int[] link = new int[1];

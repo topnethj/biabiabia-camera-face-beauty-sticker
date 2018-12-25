@@ -5,7 +5,7 @@ import android.support.annotation.NonNull;
 import com.douyaim.effect.Filter.GPUImageFilter;
 import com.douyaim.effect.Filter.GPUImageTwoInputFilter;
 import com.douyaim.effect.utils.OpenGlUtils;
-import com.douyaim.qsapp.LibApp;
+import com.douyaim.effect.LibApp;
 
 /**
  * Created by hj on 16/9/21.

@@ -1,4 +1,4 @@
-package com.douyaim.qsapp.camera.camerautil;
+package com.douyaim.qsapp.camera.widget;
 
 import android.content.Context;
 import android.graphics.SurfaceTexture;
@@ -8,6 +8,7 @@ import android.opengl.GLSurfaceView;
 import android.opengl.Matrix;
 import android.os.Bundle;
 import android.os.Message;
+import android.text.TextUtils;
 import com.douyaim.effect.Filter.GPUImageFilter;
 import com.douyaim.effect.Filter.ZZEffectFilter_v2;
 import com.douyaim.effect.face.ZZFaceManager_v2;
@@ -15,11 +16,10 @@ import com.douyaim.effect.face.ZZFaceResult;
 import com.douyaim.effect.model.AndroidSize;
 import com.douyaim.effect.utils.Rotation;
 import com.douyaim.effect.utils.TextureRotationUtil;
+import com.douyaim.qsapp.camera.camerautil.CameraController;
 import com.douyaim.qsapp.camera.filter.QSFilterManager;
 import com.douyaim.qsapp.camera.gles.FullFrameRect;
 import com.douyaim.qsapp.camera.gles.GlUtil;
-import com.douyaim.qsapp.camera.widget.CameraSurfaceView;
-import com.douyaim.qsapp.utils.StringUtils;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.FloatBuffer;
@@ -255,7 +255,7 @@ public class CameraRecordRenderer implements GLSurfaceView.Renderer {
 
     public void changeFilter(String configPath, boolean isTxAction, String actionInfo, boolean isFace) {
         filterDestroyed(false);
-        if (!StringUtils.isEmpty(configPath) && !configPath.equals(mCurrentConfigPath)) {
+        if (!TextUtils.isEmpty(configPath) && !configPath.equals(mCurrentConfigPath)) {
             txFilter = new ZZEffectFilter_v2(configPath, new AndroidSize(mSurfaceWidth, mSurfaceHeight),
                     new AndroidSize(mIncomingWidth, mIncomingHeight), isFace);
             ((ZZEffectFilter_v2) txFilter).install();

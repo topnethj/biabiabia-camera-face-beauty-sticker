@@ -13,7 +13,6 @@ import android.view.SurfaceHolder;
 
 import com.douyaim.qsapp.camera.camerautil.CameraController;
 import com.douyaim.qsapp.camera.camerautil.CameraHelper;
-import com.douyaim.qsapp.camera.camerautil.CameraRecordRenderer;
 import com.douyaim.qsapp.camera.camerautil.CommonHandlerListener;
 import com.douyaim.qsapp.camera.filter.QSFilterManager;
 

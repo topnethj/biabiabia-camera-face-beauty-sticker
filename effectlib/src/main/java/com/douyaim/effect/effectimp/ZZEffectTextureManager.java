@@ -4,7 +4,7 @@ import android.opengl.GLES20;
 import android.support.annotation.NonNull;
 
 import com.douyaim.effect.utils.OpenGlUtils;
-import com.douyaim.qsapp.LibApp;
+import com.douyaim.effect.LibApp;
 
 import java.nio.IntBuffer;
 import java.util.HashMap;

@@ -11,7 +11,7 @@ import com.douyaim.effect.face.ZZFaceResult;
 import com.douyaim.effect.utils.OpenGlUtils;
 import com.douyaim.effect.utils.ScreenUtils;
 import com.douyaim.effect.utils.UniformUtil2;
-import com.douyaim.qsapp.LibApp;
+import com.douyaim.effect.LibApp;
 import java.util.ArrayList;
 import java.util.List;
 

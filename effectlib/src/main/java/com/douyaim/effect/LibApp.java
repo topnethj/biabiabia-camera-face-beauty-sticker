@@ -1,4 +1,4 @@
-package com.douyaim.qsapp;
+package com.douyaim.effect;
 
 import android.app.Application;
 import android.content.Context;
@@ -9,7 +9,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.atomic.AtomicInteger;
 
-public abstract class LibApp extends Application {
+public class LibApp extends Application {
 
     public static final String TAG = "LibApp";
     private static Context appContext;
