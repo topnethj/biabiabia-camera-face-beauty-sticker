@@ -1,6 +1,5 @@
 package com.douyaim.effect.effectControl.effectAffectors;
 
-import com.douyaim.effect.model.Vector2;
 import com.douyaim.effect.model.Vector3;
 
 /**

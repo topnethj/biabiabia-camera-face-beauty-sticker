@@ -21,7 +21,6 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
-
 import com.douyaim.effect.LibApp;
 import com.douyaim.effect.effectimp.ZZEffectConfig_v2;
 import com.douyaim.effect.face.ZZFaceManager_v2;
