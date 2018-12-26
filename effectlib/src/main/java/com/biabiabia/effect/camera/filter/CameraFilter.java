@@ -1,4 +1,4 @@
-package com.biabiabia.app.camera.filter;
+package com.biabiabia.effect.camera.filter;
 
 import android.content.Context;
 import android.graphics.Bitmap;
@@ -6,13 +6,11 @@ import android.graphics.BitmapFactory;
 import android.opengl.GLES11Ext;
 import android.opengl.GLES20;
 import android.support.annotation.RawRes;
-
+import com.biabiabia.effect.R;
 import com.biabiabia.effect.utils.OpenGlUtils;
 import com.biabiabia.effect.utils.Rotation;
 import com.biabiabia.effect.utils.TextureRotationUtil;
-import com.biabiabia.app.R;
-import com.biabiabia.app.camera.gles.GlUtil;
-
+import com.biabiabia.effect.camera.gles.GlUtil;
 import java.io.InputStream;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;

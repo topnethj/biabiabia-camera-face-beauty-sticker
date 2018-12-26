@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.biabiabia.app.camera.gles;
+package com.biabiabia.effect.camera.gles;
 
 /*
  * Copyright 2014 Google Inc. All rights reserved.
@@ -36,7 +36,7 @@ import android.graphics.Bitmap;
 import android.opengl.Matrix;
 
 import com.biabiabia.effect.utils.OpenGlUtils;
-import com.biabiabia.app.camera.filter.IFilter;
+import com.biabiabia.effect.camera.filter.IFilter;
 
 import java.nio.FloatBuffer;
 

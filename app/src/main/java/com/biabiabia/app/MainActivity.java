@@ -25,8 +25,8 @@ import com.biabiabia.effect.LibApp;
 import com.biabiabia.effect.effectimp.ZZEffectConfig_v2;
 import com.biabiabia.effect.face.ZZFaceManager_v2;
 import com.biabiabia.effect.face.ZZFaceResult;
-import com.biabiabia.app.camera.camerautil.CameraController;
-import com.biabiabia.app.camera.widget.CameraSurfaceView;
+import com.biabiabia.effect.camera.camerautil.CameraController;
+import com.biabiabia.effect.camera.widget.CameraSurfaceView;
 import com.hulu.sdk.Faces;
 import com.hulu.sdk.HuluUtils;
 import com.biabiabia.effect.Accelerometer;
@@ -40,9 +40,9 @@ import butterknife.Unbinder;
 
 public class MainActivity extends AppCompatActivity {
 
-    private static final String txResUrl = "file:///assets/effect/tuzi.zip";
-    //private static final String txResUrl = "file:///assets/effect/piaoxin.zip";
-    //private static final String txResUrl = "file:///assets/effect/xinfeiwen.zip";
+    private static final String EFFECT_TUZI = "effect/tuzi";
+    //private static final String EFFECT_PX = "effect/piaoxin";
+    //private static final String EFFECT_FW = "effect/xinfeiwen";
 
     @BindView(R.id.specific_tip)
     protected TextView specificTip;
@@ -350,7 +350,7 @@ public class MainActivity extends AppCompatActivity {
                 break;
             case R.id.b_loadTx:
                 loadTx.setEnabled(false);
-                String ePath = ZZEffectConfig_v2.effectConfigCopy(this.getApplicationContext(), "effect/piaoxin");
+                String ePath = ZZEffectConfig_v2.effectConfigCopy(this.getApplicationContext(), EFFECT_TUZI);
                 if(ePath != null){
                     mCameraSurfaceView.changeFilter(ePath, true, "", true);
                 }else{

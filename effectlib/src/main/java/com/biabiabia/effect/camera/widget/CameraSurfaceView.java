@@ -1,4 +1,4 @@
-package com.biabiabia.app.camera.widget;
+package com.biabiabia.effect.camera.widget;
 
 import android.content.Context;
 import android.graphics.SurfaceTexture;
@@ -11,10 +11,10 @@ import android.os.Message;
 import android.util.AttributeSet;
 import android.view.SurfaceHolder;
 
-import com.biabiabia.app.camera.camerautil.CameraController;
-import com.biabiabia.app.camera.camerautil.CameraHelper;
-import com.biabiabia.app.camera.camerautil.CommonHandlerListener;
-import com.biabiabia.app.camera.filter.QSFilterManager;
+import com.biabiabia.effect.camera.camerautil.CameraController;
+import com.biabiabia.effect.camera.camerautil.CameraHelper;
+import com.biabiabia.effect.camera.camerautil.CommonHandlerListener;
+import com.biabiabia.effect.camera.filter.QSFilterManager;
 
 public class CameraSurfaceView extends GLSurfaceView
         implements CommonHandlerListener, SurfaceTexture.OnFrameAvailableListener {

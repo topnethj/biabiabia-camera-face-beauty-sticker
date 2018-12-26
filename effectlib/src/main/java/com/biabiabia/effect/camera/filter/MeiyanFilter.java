@@ -1,10 +1,9 @@
-package com.biabiabia.app.camera.filter;
+package com.biabiabia.effect.camera.filter;
 
 import android.content.Context;
 import android.opengl.GLES20;
-
-import com.biabiabia.app.R;
-import com.biabiabia.app.camera.gles.GlUtil;
+import com.biabiabia.effect.R;
+import com.biabiabia.effect.camera.gles.GlUtil;
 
 import java.nio.FloatBuffer;
 

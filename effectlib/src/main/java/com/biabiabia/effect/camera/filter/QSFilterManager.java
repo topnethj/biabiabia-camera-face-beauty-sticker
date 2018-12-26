@@ -1,4 +1,4 @@
-package com.biabiabia.app.camera.filter;
+package com.biabiabia.effect.camera.filter;
 
 import android.content.Context;
 

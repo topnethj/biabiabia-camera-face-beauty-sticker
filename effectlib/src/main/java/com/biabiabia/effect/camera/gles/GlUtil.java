@@ -1,4 +1,4 @@
-package com.biabiabia.app.camera.gles;
+package com.biabiabia.effect.camera.gles;
 /*
  * Copyright 2014 Google Inc. All rights reserved.
  *

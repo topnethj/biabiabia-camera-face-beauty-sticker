@@ -1,4 +1,4 @@
-package com.biabiabia.app.camera.camerautil;
+package com.biabiabia.effect.camera.camerautil;
 
 import android.graphics.Rect;
 import android.hardware.Camera;

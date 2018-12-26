@@ -1,4 +1,4 @@
-package com.biabiabia.app.camera.widget;
+package com.biabiabia.effect.camera.widget;
 
 import android.content.Context;
 import android.graphics.SurfaceTexture;
@@ -16,10 +16,10 @@ import com.biabiabia.effect.face.ZZFaceResult;
 import com.biabiabia.effect.model.AndroidSize;
 import com.biabiabia.effect.utils.Rotation;
 import com.biabiabia.effect.utils.TextureRotationUtil;
-import com.biabiabia.app.camera.camerautil.CameraController;
-import com.biabiabia.app.camera.filter.QSFilterManager;
-import com.biabiabia.app.camera.gles.FullFrameRect;
-import com.biabiabia.app.camera.gles.GlUtil;
+import com.biabiabia.effect.camera.camerautil.CameraController;
+import com.biabiabia.effect.camera.filter.QSFilterManager;
+import com.biabiabia.effect.camera.gles.FullFrameRect;
+import com.biabiabia.effect.camera.gles.GlUtil;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.FloatBuffer;
