@@ -1,13 +1,9 @@
-相机，美颜，人脸贴纸，内置了三种贴纸效果。<br>
+相机，美颜，人脸贴纸。
 <br>
-  allprojects {<br>
-		repositories {<br>
-			...<br>
-			maven { url 'https://jitpack.io' }<br>
-		}<br>
-	}<br>
-  <br>
-  dependencies {<br>
-	        implementation 'com.github.topnethj:biabiabia-camera-face-beauty-sticker:Tag'<br>
-	}<br>
- <br>
+<br>
+
+![图片](https://github.com/topnethj/biabiabia-camera-face-beauty-sticker/blob/master/WechatIMG16.jpeg)
+<br>
+<br>
+
+implementation 'com.github.topnethj:biabiabia-camera-face-beauty-sticker:v1.1.0'
